@@ -1,2 +1,1 @@
-# character-sheet
-A web app for DnD character sheet
+This is a [Next.js](https://nextjs.org/) project boilerplate

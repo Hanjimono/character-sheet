@@ -1,0 +1,56 @@
+@import "@/ui/constants/styles/globalSizes.module.scss";
+
+.main-menu {
+  min-width: 220px;
+  max-width: 220px;
+  height: 100%;
+  background-color: var(--colorBackgroundMenu);
+
+  .menu-logo {
+    padding: var(--spacingListOutTop) var(--spacingListOutSides);
+  }
+}
+
+.mobile-menu {
+  display: none;
+}
+
+.close-menu {
+  display: none;
+}
+
+@media (max-width: $mediumDevices) {
+  .main-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: var(--zIndexTop);
+
+    &.active {
+      display: block;
+    }
+  }
+
+  .close-menu {
+    display: block;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+  }
+
+  .mobile-menu {
+    background-color: var(--colorBackgroundMenu);
+    z-index: var(--zIndexSelect);
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    align-items: center;
+
+    &.active {
+      display: flex;
+    }
+  }
+}
