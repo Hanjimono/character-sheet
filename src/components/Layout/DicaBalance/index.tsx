@@ -3,7 +3,7 @@
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 // ui
 import Room from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
@@ -11,6 +11,7 @@ import Switch from "@/ui/Form/Switch"
 import { DiceBalanceProps } from "./types"
 import PlayerSelect from "@/components/Helpers/PlayerSelect"
 import { useStore } from "@/store"
+import { DiceBalanceInfo } from "@/constants/types/dice"
 
 function DiceBalance({
   className,
@@ -25,6 +26,13 @@ function DiceBalance({
       className
     )
   )
+  const [balance, setBalance] = useState<DiceBalanceInfo>({
+    totalPositive: 0,
+    totalNegative: 0
+  })
+  console.log("🚀 ---------------------🚀")
+  console.log("🚀 ~ balance:", balance)
+  console.log("🚀 ---------------------🚀")
   const openModal = useStore((state) => state.openModal)
   const handleSaveDiceRoll = (isPositive: boolean) => {
     openModal("diceRollSaver", {
@@ -33,10 +41,30 @@ function DiceBalance({
       isNotClosable: true
     })
   }
+  const fetchBalance = useCallback(async () => {
+    if (!gameId || !characterId) return
+    const url = isShowGameStats
+      ? "/api/stats/rolls/game"
+      : "/api/stats/rolls/total"
+    const response = await fetch(url + `?character=${characterId}`)
+    if (!response.ok) {
+      return
+    }
+    const data = await response.json()
+    setBalance(data as DiceBalanceInfo)
+  }, [gameId, characterId, isShowGameStats])
+  useEffect(() => {
+    fetchBalance()
+  }, [fetchBalance, isShowGameStats])
+
   return (
     <Room className={calculatedClassNames}>
       <div className="flex w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
-        <Dice isPositive={false} onClick={handleSaveDiceRoll} />
+        <Dice
+          isPositive={false}
+          onClick={handleSaveDiceRoll}
+          count={balance.totalNegative}
+        />
         <div className="flex flex-col h-full justify-center content-center items-center px-4">
           <span className="text-2xl bold">Critical Rolls</span>
           <Switch
@@ -48,7 +76,11 @@ function DiceBalance({
             disabled={!gameId}
           />
         </div>
-        <Dice isPositive={true} onClick={handleSaveDiceRoll} />
+        <Dice
+          isPositive={true}
+          onClick={handleSaveDiceRoll}
+          count={balance.totalPositive}
+        />
       </div>
     </Room>
   )

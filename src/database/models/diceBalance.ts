@@ -39,6 +39,25 @@ export class DiceBalance extends Model {
     }
     return true
   }
+
+  public static async getTotalBalance(campaignId: number, playerId?: number) {
+    const balances = await DiceBalance.findAll({
+      where: {
+        campaignId: campaignId,
+        ...(playerId && { playerId: playerId })
+      }
+    })
+    let totalPositive = 0
+    let totalNegative = 0
+    for (const balance of balances) {
+      totalPositive += balance.positiveBalance
+      totalNegative += balance.negativeBalance
+    }
+    return {
+      totalPositive,
+      totalNegative
+    }
+  }
 }
 
 DiceBalance.init(

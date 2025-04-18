@@ -17,6 +17,18 @@ import Button from "@/ui/Actions/Button"
 // Styles and types
 import { DiceRollSaverModalProps } from "./types"
 
+/**
+ * A modal component for saving the result of a critical dice roll.
+ *
+ * @component
+ * @param {DiceRollSaverModalProps} props - The properties for the DiceRollSaverModal component.
+ * @param {string} [props.className] - Additional class names to style the modal.
+ * @param {() => void} [props.onConfirm] - Callback function triggered after successfully saving the roll.
+ * @param {boolean} props.isNegative - Indicates whether the roll is a natural 1 (true) or a natural 20 (false).
+ * @param {string} props.characterId - The ID of the character associated with the roll.
+ * @param {string} [props.title="Save result of Critical Roll"] - The title of the modal.
+ * @param {() => void} props.onClose - Callback function triggered when the modal is closed.
+ */
 function DiceRollSaverModal({
   className,
   onConfirm,

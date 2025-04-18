@@ -28,6 +28,33 @@ export class DiceBalanceHistory extends Model {
     })
     return true
   }
+
+  public static async getRollsSum(
+    campaignId: number,
+    gameId: number,
+    playerId?: number
+  ) {
+    const rolls = await DiceBalanceHistory.findAll({
+      where: {
+        campaignId: campaignId,
+        gameId: gameId,
+        ...(playerId && { playerId: playerId })
+      }
+    })
+    let totalPositive = 0
+    let totalNegative = 0
+    for (const roll of rolls) {
+      if (roll.isNegative) {
+        totalNegative += roll.count
+      } else {
+        totalPositive += roll.count
+      }
+    }
+    return {
+      totalPositive,
+      totalNegative
+    }
+  }
 }
 
 DiceBalanceHistory.init(
