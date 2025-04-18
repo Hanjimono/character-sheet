@@ -1,6 +1,7 @@
 import { AlertModalProps } from "@/modals/Helpers/Alert/types"
 import { ModalName } from "@/constants/modalList"
 import { ConfirmModalProps } from "@/modals/Helpers/Confirm/types"
+import { DiceRollSaverModalProps } from "@/modals/Savers/DiceRollSaver/types"
 
 /**
  * Props that can be used in any modal but will be passed to the wrapper component
@@ -41,4 +42,6 @@ type ModalPropsForStore<T extends DefaultModalProps> = Omit<
 export interface ModalStoreInterfaceMap {
   alert: DefaultModalContainerProps & ModalPropsForStore<AlertModalProps>
   confirm: DefaultModalContainerProps & ModalPropsForStore<ConfirmModalProps>
+  diceRollSaver: DefaultModalContainerProps &
+    ModalPropsForStore<DiceRollSaverModalProps>
 }

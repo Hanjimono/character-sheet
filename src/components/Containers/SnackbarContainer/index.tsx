@@ -41,7 +41,7 @@ export default function SnackbarContainer() {
                   idx === 0 && Object.entries(listOfOpenSnackbar).length <= 1
                 }
               >
-                {message} + + {snackbarKey}
+                {message}
               </Snackbar>
             )}
           </AnimatePresence>

@@ -9,6 +9,8 @@ import Room from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { DiceBalanceProps } from "./types"
+import PlayerSelect from "@/components/Helpers/PlayerSelect"
+import { useStore } from "@/store"
 
 function DiceBalance({
   className,
@@ -23,10 +25,18 @@ function DiceBalance({
       className
     )
   )
+  const openModal = useStore((state) => state.openModal)
+  const handleSaveDiceRoll = (isPositive: boolean) => {
+    openModal("diceRollSaver", {
+      isNegative: !isPositive,
+      characterId: characterId,
+      isNotClosable: true
+    })
+  }
   return (
     <Room className={calculatedClassNames}>
       <div className="flex w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
-        <Dice isPositive={false} />
+        <Dice isPositive={false} onClick={handleSaveDiceRoll} />
         <div className="flex flex-col h-full justify-center content-center items-center px-4">
           <span className="text-2xl bold">Critical Rolls</span>
           <Switch
@@ -38,7 +48,7 @@ function DiceBalance({
             disabled={!gameId}
           />
         </div>
-        <Dice isPositive={true} />
+        <Dice isPositive={true} onClick={handleSaveDiceRoll} />
       </div>
     </Room>
   )
@@ -46,10 +56,12 @@ function DiceBalance({
 
 function Dice({
   isPositive,
-  count = 0
+  count = 0,
+  onClick = (isPositive) => {}
 }: {
   isPositive: boolean
   count?: number
+  onClick?: (isPositive: boolean) => void
 }) {
   return (
     <div className="flex flex-col h-full justify-center content-center items-center">
@@ -59,6 +71,7 @@ function Dice({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
         whileHover={{ scale: 1.1 }}
+        onClick={() => onClick(isPositive)}
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 0 550 550">
           <path

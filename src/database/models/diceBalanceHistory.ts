@@ -12,6 +12,22 @@ export class DiceBalanceHistory extends Model {
   // timestamps
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
+
+  public static async saveRollForPlayer(
+    playerId: number,
+    campaignId: number,
+    gameId: number,
+    isNegative: boolean
+  ) {
+    await DiceBalanceHistory.create({
+      playerId: playerId,
+      campaignId: campaignId,
+      gameId: gameId,
+      count: 1,
+      isNegative: isNegative
+    })
+    return true
+  }
 }
 
 DiceBalanceHistory.init(

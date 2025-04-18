@@ -5,5 +5,5 @@ export async function GET(request: Request) {
   const characterId = searchParams.get("character")
   const players = await Player.getPlayersForCharacter(Number(characterId) || 0)
 
-  return Response.json({ players, characterId })
+  return Response.json({ players })
 }

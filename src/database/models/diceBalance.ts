@@ -11,6 +11,34 @@ export class DiceBalance extends Model {
   // timestamps
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
+
+  public static async saveBalanceForPlayer(
+    plyerId: number,
+    campaignId: number,
+    isNegative: boolean
+  ) {
+    const balance = await DiceBalance.findOne({
+      where: {
+        playerId: plyerId,
+        campaignId: campaignId
+      }
+    })
+    if (!balance) {
+      await DiceBalance.create({
+        playerId: plyerId,
+        campaignId: campaignId,
+        positiveBalance: isNegative ? 0 : 1,
+        negativeBalance: isNegative ? 1 : 0
+      })
+      return true
+    }
+    if (isNegative) {
+      await balance.increment("negativeBalance")
+    } else {
+      await balance.increment("positiveBalance")
+    }
+    return true
+  }
 }
 
 DiceBalance.init(

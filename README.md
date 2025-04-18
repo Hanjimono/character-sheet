@@ -4,7 +4,7 @@ This is a small personal project for playing DnD. Its main goal is to add some v
 
 For now, it's a sheet for a specific character, but the functionality is being developed with the idea that there could be multiple characters in the future.
 
-## Планируемый функционал
+## Planned Features
 
 - [ ] A visually styled sheet with the right atmosphere, showing the main character info
 - [ ] Interaction with `.md` files and Obsidian vaults
@@ -15,7 +15,8 @@ For now, it's a sheet for a specific character, but the functionality is being d
 - [ ] Reminders to sort through chaotic notes made during a session
 - [ ] Reminders about important notes to keep in mind during the session
 
-Stack
+## Stack
+
 Next.js + zustand + my UI-kit + sequelize
 
 ## Build Instructions
