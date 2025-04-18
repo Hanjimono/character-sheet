@@ -28,7 +28,8 @@
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".sequelizerc"
   ],
   "exclude": ["node_modules"]
 }

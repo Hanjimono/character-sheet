@@ -8,10 +8,11 @@ import Beam from "@/ui/Layout/Beam"
 import Frame from "@/ui/Layout/Frame"
 // types and styles
 import "./global.css"
+import Header from "@/components/Layout/Header"
 
 export const metadata = {
-  title: "ui-boilerplate",
-  description: "Boilerplate for Next.js development with ui-kit"
+  title: "DnD character sheet",
+  description: "A simple DnD character sheet"
 }
 
 export default function RootLayout({
@@ -35,6 +36,7 @@ export default function RootLayout({
       <body className={openSans.className}>
         <Foundation>
           <Beam withoutWrap whole withoutGap>
+            <Header />
             <Frame className="main-content">{children}</Frame>
           </Beam>
         </Foundation>
