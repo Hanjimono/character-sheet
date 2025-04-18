@@ -5,13 +5,15 @@ import { twMerge } from "tailwind-merge"
 import { motion } from "framer-motion"
 import { useCallback, useEffect, useState } from "react"
 // ui
-import Room from "@/ui/Layout/Room"
+import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { DiceBalanceProps } from "./types"
 import PlayerSelect from "@/components/Helpers/PlayerSelect"
 import { useStore } from "@/store"
 import { DiceBalanceInfo } from "@/constants/types/dice"
+import Button from "@/ui/Actions/Button"
+import DiceBalanceStatsTable from "./DiceBalanceStatsTable"
 
 function DiceBalance({
   className,
@@ -26,19 +28,18 @@ function DiceBalance({
       className
     )
   )
+  const [isShowDetails, setIsShowDetails] = useState(false)
   const [balance, setBalance] = useState<DiceBalanceInfo>({
     totalPositive: 0,
     totalNegative: 0
   })
-  console.log("🚀 ---------------------🚀")
-  console.log("🚀 ~ balance:", balance)
-  console.log("🚀 ---------------------🚀")
   const openModal = useStore((state) => state.openModal)
   const handleSaveDiceRoll = (isPositive: boolean) => {
     openModal("diceRollSaver", {
       isNegative: !isPositive,
       characterId: characterId,
-      isNotClosable: true
+      isNotClosable: true,
+      onConfirm: fetchBalance
     })
   }
   const fetchBalance = useCallback(async () => {
@@ -58,31 +59,49 @@ function DiceBalance({
   }, [fetchBalance, isShowGameStats])
 
   return (
-    <Room className={calculatedClassNames}>
-      <div className="flex w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
-        <Dice
-          isPositive={false}
-          onClick={handleSaveDiceRoll}
-          count={balance.totalNegative}
-        />
-        <div className="flex flex-col h-full justify-center content-center items-center px-4">
-          <span className="text-2xl bold">Critical Rolls</span>
-          <Switch
-            name="total-critical-rolls"
-            className="mt-close"
-            onChange={() => setIsShowGameStats(!isShowGameStats)}
-            checked={isShowGameStats}
-            label="Game stats"
-            disabled={!gameId}
+    <>
+      <Room className={calculatedClassNames}>
+        <div className="flex w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
+          <Dice
+            isPositive={false}
+            onClick={handleSaveDiceRoll}
+            count={balance.totalNegative}
+          />
+          <div className="flex flex-col h-full justify-center content-center items-center px-4">
+            <span className="text-2xl bold">Critical Rolls</span>
+            <Switch
+              name="total-critical-rolls"
+              className="mt-close"
+              onChange={() => setIsShowGameStats(!isShowGameStats)}
+              checked={isShowGameStats}
+              label="Game stats"
+              disabled={!gameId}
+            />
+            <Button
+              className="p-0 text-sm h-8"
+              text
+              secondary
+              onClick={() => setIsShowDetails(!isShowDetails)}
+              endIcon={isShowDetails ? "arrow_drop_up" : "arrow_drop_down"}
+            >
+              details
+            </Button>
+          </div>
+          <Dice
+            isPositive={true}
+            onClick={handleSaveDiceRoll}
+            count={balance.totalPositive}
           />
         </div>
-        <Dice
-          isPositive={true}
-          onClick={handleSaveDiceRoll}
-          count={balance.totalPositive}
+      </Room>
+      <HiddenRoom isShown={isShowDetails}>
+        <DiceBalanceStatsTable
+          campaignId={campaignId}
+          gameId={gameId}
+          isShowGameStats={isShowGameStats}
         />
-      </div>
-    </Room>
+      </HiddenRoom>
+    </>
   )
 }
 
