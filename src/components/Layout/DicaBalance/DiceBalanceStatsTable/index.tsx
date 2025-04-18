@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge"
 import Room from "@/ui/Layout/Room"
 import { useCallback, useEffect, useState } from "react"
 import { DiceBalancePlayerInfo } from "@/constants/types/dice"
+import Title from "@/ui/Presentation/Title"
 
 function DiceBalanceStatsTable({
   className,
@@ -15,7 +16,7 @@ function DiceBalanceStatsTable({
 }: DiceBalanceStatsTableProps) {
   const calculatedClassNames = cx(
     twMerge(
-      "dice-balance-stats-table bg-block-700 min-w-full min-h-24 min-h-full h-fit overflow-auto rounded-md p-4",
+      "dice-balance-stats-table bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
       className
     )
   )
@@ -39,7 +40,9 @@ function DiceBalanceStatsTable({
     <div className={calculatedClassNames}>
       <div className="flex flex-col gap-2 overflow-visible">
         <div className="flex justify-between items-center w-full">
-          <h3 className="text-lg font-semibold">Dice Balance</h3>
+          <Title size={3} bottomGap="almost-same">
+            Dice Balance
+          </Title>
         </div>
         <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-block-600 dark:bg-block-600 dark:text-gray-400">
