@@ -1,3 +1,5 @@
+import { PlayerInfo } from "./players"
+
 export type BaseCoinTypes = "gold" | "silver" | "copper"
 
 export type CoinType = BaseCoinTypes | "platinum" | "electrum"
@@ -10,3 +12,17 @@ export interface Coin {
 }
 
 export type CoinsInfo = Record<CoinType, Coin>
+
+export interface MoneyHistory {
+  amount: number
+  isNegative: boolean
+  isTransfer: boolean
+  fromPlayer?: string
+  toPlayer?: string
+  comment?: string
+}
+export interface MoneyBalancePlayerInfo {
+  player: PlayerInfo
+  amount: number
+  history: MoneyHistory[]
+}

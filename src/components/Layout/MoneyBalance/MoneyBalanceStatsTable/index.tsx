@@ -1,0 +1,77 @@
+// System
+import { cx } from "class-variance-authority"
+import { twMerge } from "tailwind-merge"
+// Styles and types
+import { MoneyBalanceStatsTableProps } from "./types"
+import { useCallback, useEffect, useState } from "react"
+import { MoneyBalancePlayerInfo } from "@/constants/types/money"
+import MoneyRender from "@/components/Helpers/MoneyRender"
+
+function MoneyBalanceStatsTable({
+  className,
+  totalBalance,
+  characterId
+}: MoneyBalanceStatsTableProps) {
+  const calculatedClassNames = cx(
+    twMerge(
+      "money-balance-stats bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
+      className
+    )
+  )
+  const [stats, setStats] = useState<MoneyBalancePlayerInfo[]>([])
+  const fetchStats = useCallback(async () => {
+    const response = await fetch(`/api/money/stats?character=${characterId}`)
+    const data = await response.json()
+    setStats(data)
+  }, [characterId, setStats])
+  useEffect(() => {
+    fetchStats()
+  }, [fetchStats, totalBalance])
+  return (
+    <div className={calculatedClassNames}>
+      <div className="flex flex-col gap-2 overflow-visible">
+        <div className="flex justify-between items-center w-full">
+          <h3 className="text-lg font-semibold text-gray-200">Money Balance</h3>
+        </div>
+      </div>
+      {stats.map((stat) => (
+        <>
+          <div
+            key={stat.player.id}
+            className="flex justify-between items-center w-full p-2 bg-block-600 rounded-md mb-2"
+          >
+            <span className="text-gray-200">{stat.player.name}</span>
+            <span className="text-gray-200">
+              <MoneyRender
+                amount={stat.amount}
+                className="bg-block-800 py-2 px-3 rounded-lg"
+                isShowZero
+              />
+            </span>
+          </div>
+          {stat.history.length > 0 && (
+            <div className="flex flex-col overflow-visible">
+              {stat.history.map((history, idx) => (
+                <div
+                  key={idx}
+                  className={cx(
+                    twMerge(
+                      "flex justify-between items-center w-full px-2 py-0.5 rounded-md mb-2",
+                      history.isNegative ? "bg-red-800" : "bg-green-700"
+                    )
+                  )}
+                >
+                  <span className="text-gray-400">{history.comment}</span>
+                  <span className="text-gray-200">
+                    <MoneyRender amount={history.amount} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ))}
+    </div>
+  )
+}
+export default MoneyBalanceStatsTable

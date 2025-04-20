@@ -1,5 +1,5 @@
 import { COINS } from "@/constants/money"
-import { BaseCoinTypes } from "@/constants/types/money"
+import { BaseCoinTypes, CoinType } from "@/constants/types/money"
 
 export function transformMoneyFromCopperToCoins(
   amount: number
@@ -16,4 +16,17 @@ export function transformMoneyFromCopperToCoins(
   transformedMoney.copper = amount
 
   return transformedMoney
+}
+
+export function transformCoinsToCopper(
+  coins: Record<CoinType, number>
+): number {
+  let totalCopper = 0
+  for (const coinType in coins) {
+    if (Object.prototype.hasOwnProperty.call(coins, coinType)) {
+      const coinValue = COINS[coinType as CoinType].inCopper
+      totalCopper += coins[coinType as CoinType] * coinValue
+    }
+  }
+  return totalCopper
 }

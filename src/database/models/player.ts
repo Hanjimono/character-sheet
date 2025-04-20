@@ -19,6 +19,14 @@ export class Player extends Model {
       }
     })
   }
+
+  public static async getPlayerById(playerId: number) {
+    return await Player.findOne({
+      where: {
+        id: playerId
+      }
+    })
+  }
 }
 
 Player.init(
