@@ -3,6 +3,7 @@ import { ModalName } from "@/constants/modalList"
 import { ConfirmModalProps } from "@/modals/Helpers/Confirm/types"
 import { DiceRollSaverModalProps } from "@/modals/Savers/DiceRollSaver/types"
 import { MoneyChangeSaverModalProps } from "@/modals/Savers/MoneyChangeSaver/types"
+import { DamageSaverModalProps } from "@/modals/Savers/DamageSaver/types"
 
 /**
  * Props that can be used in any modal but will be passed to the wrapper component
@@ -47,4 +48,6 @@ export interface ModalStoreInterfaceMap {
     ModalPropsForStore<DiceRollSaverModalProps>
   moneyChangeSaver: DefaultModalContainerProps &
     ModalPropsForStore<MoneyChangeSaverModalProps>
+  damageSaver: DefaultModalContainerProps &
+    ModalPropsForStore<DamageSaverModalProps>
 }

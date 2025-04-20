@@ -9,6 +9,7 @@ import Button from "@/ui/Actions/Button"
 // Styles and types
 import { GameViewProps } from "./types"
 import MoneyBalance from "../../MoneyBalance"
+import DamageBalance from "../../DamageBalance"
 
 function GameView({ campaignId, characterId }: GameViewProps) {
   const [game, setGame] = useState<number | null>(null)
@@ -100,6 +101,13 @@ function GameView({ campaignId, characterId }: GameViewProps) {
       </Room>
       <Room>
         <MoneyBalance
+          campaignId={campaignId}
+          gameId={game || undefined}
+          characterId={characterId}
+        />
+      </Room>
+      <Room>
+        <DamageBalance
           campaignId={campaignId}
           gameId={game || undefined}
           characterId={characterId}
