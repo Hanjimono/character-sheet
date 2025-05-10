@@ -17,7 +17,7 @@ export function success<T>(data: T, init?: ResponseInit) {
 export function error(
   message: string,
   details?: string,
-  status: number = 500,
+  status: number = 200,
   init?: ResponseInit
 ) {
   const responseData: ApiResponse<null> = {

@@ -1,17 +1,13 @@
-import { Campaign } from "@/database/models/campaign"
 import { Game } from "@/database/models/game"
+import { withGameContext } from "@/lib/api/context/game"
 
-export async function POST(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const campaign = await Campaign.getActiveCampaign(Number(characterId || 0))
+export const POST = withGameContext(async ({ campaign, game }) => {
+  if (!!game) {
+    return game
+  }
   if (!campaign) {
-    return Response.json({ game: null })
+    throw new Error("Campaign not found")
   }
-  const activeGame = await Game.getActiveGame(campaign.id)
-  if (activeGame) {
-    return Response.json({ game: activeGame })
-  }
-  const game = await Game.startNewGame(campaign.characterId, campaign.id)
-  return Response.json({ game })
-}
+  const newGame = await Game.startNewGame(campaign.characterId, campaign.id)
+  return newGame
+})
