@@ -1,6 +1,19 @@
 // Styles and types
 import { CoinSignProps } from "./types"
 
+/**
+ * Renders an SVG icon representing a coin sign based on the provided type.
+ *
+ * Supported coin types:
+ * - "gold": Gold coin icon
+ * - "silver": Silver coin icon
+ * - "platinum": Platinum coin icon
+ * - "electrum": Electrum coin icon
+ * - "copper": Copper coin icon (default)
+ *
+ * @param {"gold" | "silver" | "platinum" | "electrum" | "copper"} props.type - The type of coin to display.
+ * @param {string} [props.viewBox="0 0 24 24"] - The SVG viewBox attribute.
+ */
 function CoinSign({ type, viewBox = "0 0 24 24" }: CoinSignProps) {
   switch (type) {
     case "gold":

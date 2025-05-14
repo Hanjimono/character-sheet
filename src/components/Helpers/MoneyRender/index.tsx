@@ -1,11 +1,19 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// Styles and types
-import { MoneyRenderProps } from "./types"
+// Components
 import { transformMoneyFromCopperToCoins } from "@/utils"
 import CoinSign from "../CoinSign"
+// Styles and types
+import { MoneyRenderProps } from "./types"
 
+/**
+ * Renders a visual representation of a monetary amount using gold, silver, and copper coins.
+ *
+ * @param props.className - Optional additional CSS class names to apply to the container.
+ * @param props.amount - The total amount in copper coins to be displayed. Defaults to 0.
+ * @param props.isShowZero - If true, displays zero values for all coin types; otherwise, only non-zero coins are shown.
+ */
 function MoneyRender({
   className,
   amount = 0,

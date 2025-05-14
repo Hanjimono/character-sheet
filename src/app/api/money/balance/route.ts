@@ -1,14 +1,11 @@
-import { Campaign } from "@/database/models/campaign"
 import { MoneyBalance } from "@/database/models/moneyBalance"
+import { withGameContext } from "@/lib/api/context/game"
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const campaign = await Campaign.getActiveCampaign(Number(characterId || 0))
+export const GET = withGameContext(async ({ campaign }) => {
   if (!campaign) {
-    return Response.json({ total: 0, common: 0 })
+    throw new Error("No campaign found")
   }
   const commonBalance = await MoneyBalance.getCommonBalance(campaign.id)
   const totalBalance = await MoneyBalance.getTotalBalance(campaign.id)
-  return Response.json({ total: totalBalance, common: commonBalance })
-}
+  return { total: totalBalance, common: commonBalance }
+})

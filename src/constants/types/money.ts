@@ -21,6 +21,16 @@ export interface MoneyHistory {
   toPlayer?: string
   comment?: string
 }
+
+/**
+ * Represents information about a money balance
+ */
+export interface MoneyBalanceInfo {
+  /** Amount of common funds. */
+  common: number
+  /** Total amount of money for every player. */
+  total: number
+}
 export interface MoneyBalancePlayerInfo {
   player: PlayerInfo
   amount: number
