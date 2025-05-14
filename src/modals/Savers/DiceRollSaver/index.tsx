@@ -2,10 +2,10 @@
 import { useCallback, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { cx } from "class-variance-authority"
+// Service
+import { usePostData } from "@/service/fetcher"
 // Constants
 import { PlayerInfo } from "@/constants/types/players"
-// Store
-import { useStore } from "@/store"
 // Components
 import PlayerSelect from "@/components/Helpers/PlayerSelect"
 // Ui
@@ -37,56 +37,30 @@ function DiceRollSaverModal({
   title = "Save result of Critical Roll",
   onClose
 }: DiceRollSaverModalProps) {
-  const successSnack = useStore((state) => state.successSnack)
-  const errorSnack = useStore((state) => state.errorSnack)
   const calculatedClassNames = twMerge(
     cx("dice-saver box-border min-w-96", className)
   )
   const [player, setPlayer] = useState<PlayerInfo | undefined>()
+  const [saveCriticalRoll] = usePostData(
+    "/api/stats/rolls/save",
+    {},
+    characterId,
+    {
+      player: player?.id,
+      isNegative
+    },
+    `Roll saved for ${player?.name} (it's ${isNegative ? "natural 1" : "natural 20"})`
+  )
   const handleSave = useCallback(async () => {
     if (!player) {
       return
     }
-    try {
-      const response = await fetch(
-        "/api/stats/rolls/save?character=" + characterId,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            player: player.id,
-            isNegative: isNegative
-          }),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      )
-      const data = await response.json()
-      if (!data.success) {
-        errorSnack("Error saving roll")
-        onClose()
-        return
-      }
-      successSnack(
-        `Roll saved for ${player.name} (it's ${isNegative ? "natural 1" : "natural 20"})`
-      )
-      if (!!onConfirm) {
-        onConfirm()
-      }
-      onClose()
-    } catch (error) {
-      errorSnack("Error saving roll")
+    const result = await saveCriticalRoll()
+    if (result) {
+      onConfirm?.()
       onClose()
     }
-  }, [
-    characterId,
-    player,
-    onClose,
-    onConfirm,
-    isNegative,
-    errorSnack,
-    successSnack
-  ])
+  }, [player, saveCriticalRoll, onConfirm, onClose])
   return (
     <Modal title={title} onClose={onClose} className={calculatedClassNames}>
       <Room>

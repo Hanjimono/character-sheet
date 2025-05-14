@@ -12,7 +12,7 @@ export function apiHandler<ResponseDataType>(
       return success<ResponseDataType>(await handler(req))
     } catch (e) {
       if (e instanceof Error) {
-        return error(e.message, e.stack, 500)
+        return error(e.message, e.stack)
       }
       return error("Internal server error")
     }

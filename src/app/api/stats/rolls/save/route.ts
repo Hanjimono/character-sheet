@@ -1,37 +1,43 @@
-import { Campaign } from "@/database/models/campaign"
+import { ApiGameContext } from "@/constants/types/api"
+import { DiceRollSaveRequest } from "@/constants/types/dice"
 import { DiceBalance } from "@/database/models/diceBalance"
 import { DiceBalanceHistory } from "@/database/models/diceBalanceHistory"
-import { Game } from "@/database/models/game"
+import { withGameContext } from "@/lib/api/context/game"
+import { withPostValidateContext } from "@/lib/api/context/postValidate"
+import * as yup from "yup"
 
-export async function POST(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const data = await request.json()
-  const { player, isNegative } = data
-  const campaign = await Campaign.getActiveCampaign(Number(characterId || 0))
-  if (!campaign) {
-    return Response.json({ success: false })
-  }
-  const activeGame = await Game.getActiveGame(campaign.id)
-  if (!activeGame) {
-    return Response.json({ success: false })
-  }
-  const historySaveResult = await DiceBalanceHistory.saveRollForPlayer(
-    player,
-    campaign.id,
-    activeGame.id,
-    isNegative
+const saveRollValidateSchema = yup.object().shape({
+  player: yup.number().required(),
+  isNegative: yup.boolean(),
+  test: yup.number().required()
+})
+
+export const POST = withGameContext(async (ctx) =>
+  withPostValidateContext<DiceRollSaveRequest, ApiGameContext, boolean>(
+    ctx,
+    saveRollValidateSchema,
+    async ({ game, campaign }, { player, isNegative }) => {
+      if (!game || !campaign) {
+        throw new Error("No active game or campaign")
+      }
+      const historySaveResult = await DiceBalanceHistory.saveRollForPlayer(
+        player,
+        campaign.id,
+        game.id,
+        isNegative || false
+      )
+      if (!historySaveResult) {
+        throw new Error("Failed to save roll history")
+      }
+      const balanceSaveResult = await DiceBalance.saveBalanceForPlayer(
+        player,
+        campaign.id,
+        isNegative || false
+      )
+      if (!balanceSaveResult) {
+        throw new Error("Failed to save balance")
+      }
+      return true
+    }
   )
-  if (!historySaveResult) {
-    return Response.json({ success: false })
-  }
-  const balanceSaveResult = await DiceBalance.saveBalanceForPlayer(
-    player,
-    campaign.id,
-    isNegative
-  )
-  if (!balanceSaveResult) {
-    return Response.json({ success: false })
-  }
-  return Response.json({ success: true })
-}
+)

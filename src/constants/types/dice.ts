@@ -10,3 +10,9 @@ export interface DiceBalancePlayerInfo {
   totalPositive: number
   totalNegative: number
 }
+
+export interface DiceRollSaveRequest {
+  player: number
+  isNegative?: boolean
+  test?: number
+}

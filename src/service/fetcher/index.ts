@@ -176,6 +176,7 @@ export function useFetchAndStoreData<ResponseDataType>(
  * @param query - An optional object containing query parameters to include in the request.
  * @param characterId - An optional character ID to include in the request, defaults to `null`.
  * @param body - An optional object containing the body of the POST request.
+ * @param successMessage - An optional success message to display upon successful request.
  * @returns A tuple containing:
  *   - A function to trigger the POST request.
  *   - A boolean indicating whether the request is currently loading.
@@ -184,10 +185,12 @@ export function usePostData(
   api: string,
   query: Record<string, any> = {},
   characterId: number | null = null,
-  body: Record<string, any> = {}
+  body: Record<string, any> = {},
+  successMessage?: string
 ): [() => Promise<boolean>, boolean] {
   const [loading, setLoading] = useState(false)
   const errorSnack = useStore((state) => state.errorSnack)
+  const successSnack = useStore((state) => state.successSnack)
   const postData = useCallback(async () => {
     setLoading(true)
     try {
@@ -203,6 +206,9 @@ export function usePostData(
         throw new Error(responseResult.error || "An unknown error occurred")
       }
       setLoading(false)
+      if (successMessage) {
+        successSnack(successMessage)
+      }
       return responseResult.success
     } catch (error) {
       setLoading(false)
@@ -213,6 +219,6 @@ export function usePostData(
       }
     }
     return false
-  }, [api, errorSnack, characterId, body, query])
+  }, [api, errorSnack, characterId, body, query, successMessage, successSnack])
   return [postData, loading]
 }

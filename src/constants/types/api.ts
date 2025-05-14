@@ -24,10 +24,14 @@ export interface ApiCampaignContext {
   campaign: Campaign | null
 }
 
-/**  A wrapper interface for API handlers that provides the active game context. */
-export interface ApiGameContext {
+/**  A base interface for API handlers that provides the request object. */
+export interface BaseApiContext {
   /** The request object */
   req: Request
+}
+
+/**  A wrapper interface for API handlers that provides the active game context. */
+export interface ApiGameContext extends BaseApiContext {
   /** The ID of the character associated with the request */
   characterId: number
   /** The active campaign for the character, if any */
