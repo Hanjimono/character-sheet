@@ -107,10 +107,7 @@ function MoneyBalance({ className, characterId, gameId }: MoneyBalanceProps) {
         </Beam>
       </Room>
       <HiddenRoom isShown={isShowDetails && !!gameId}>
-        <MoneyBalanceStatsTable
-          characterId={characterId}
-          totalBalance={moneyBalance ? moneyBalance.total : 0}
-        />
+        <MoneyBalanceStatsTable characterId={characterId} />
       </HiddenRoom>
     </>
   )

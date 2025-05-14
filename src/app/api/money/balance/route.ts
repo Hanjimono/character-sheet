@@ -1,7 +1,7 @@
 import { MoneyBalance } from "@/database/models/moneyBalance"
-import { withGameContext } from "@/lib/api/context/game"
+import { withCampaignContext } from "@/lib/api/context/campaing"
 
-export const GET = withGameContext(async ({ campaign }) => {
+export const GET = withCampaignContext(async ({ campaign }) => {
   if (!campaign) {
     throw new Error("No campaign found")
   }
