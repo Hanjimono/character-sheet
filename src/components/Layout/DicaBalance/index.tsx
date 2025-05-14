@@ -98,8 +98,7 @@ function DiceBalance({
       </Room>
       <HiddenRoom isShown={isShowDetails}>
         <DiceBalanceStatsTable
-          campaignId={campaignId}
-          gameId={gameId}
+          characterId={characterId}
           isShowGameStats={isShowGameStats}
         />
       </HiddenRoom>

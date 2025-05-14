@@ -1,17 +1,25 @@
 // System
-// Styles and types
 import { cx } from "class-variance-authority"
-import { DiceBalanceStatsTableProps } from "./types"
 import { twMerge } from "tailwind-merge"
-import Room from "@/ui/Layout/Room"
-import { useCallback, useEffect, useState } from "react"
-import { DiceBalancePlayerInfo } from "@/constants/types/dice"
+import { useMemo } from "react"
+// Service
+import { useFetchAndStoreData } from "@/service/fetcher"
+// ui
 import Title from "@/ui/Presentation/Title"
+// Styles and types
+import { DiceBalanceStatsTableProps } from "./types"
+import { DiceBalancePlayerInfo } from "@/constants/types/dice"
 
+/**
+ * Renders a table displaying dice balance statistics for players, including counts of natural 20s and natural 1s.
+ *
+ * @param {string} [props.className] - Optional additional class names to apply to the table container.
+ * @param {string} props.characterId - The ID of the character for which to fetch and display stats.
+ * @param {boolean} props.isShowGameStats - Flag indicating whether to show game statistics.
+ */
 function DiceBalanceStatsTable({
   className,
-  campaignId,
-  gameId,
+  characterId,
   isShowGameStats
 }: DiceBalanceStatsTableProps) {
   const calculatedClassNames = cx(
@@ -20,22 +28,16 @@ function DiceBalanceStatsTable({
       className
     )
   )
-  const [stats, setStats] = useState<DiceBalancePlayerInfo[]>([])
-  const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/stats/rolls/table" +
-        `?character=${campaignId}` +
-        `&game=${isShowGameStats}`
-    )
-    if (!response.ok) {
-      return
+  const params = useMemo(() => {
+    return {
+      isShowGameStats: isShowGameStats
     }
-    const data = await response.json()
-    setStats(data as DiceBalancePlayerInfo[])
-  }, [campaignId, isShowGameStats])
-  useEffect(() => {
-    fetchData()
-  }, [fetchData, isShowGameStats])
+  }, [isShowGameStats])
+  const [stats] = useFetchAndStoreData<DiceBalancePlayerInfo[]>(
+    "/api/stats/rolls/table",
+    params,
+    characterId
+  )
   return (
     <div className={calculatedClassNames}>
       <div className="flex flex-col gap-2 overflow-visible">
@@ -59,18 +61,19 @@ function DiceBalanceStatsTable({
             </tr>
           </thead>
           <tbody>
-            {stats.map((stat) => (
-              <tr
-                key={stat.player.id}
-                className="bg-block-700 border-b dark:bg-block-700 dark:border-block-600 hover:bg-block-600 dark:hover:bg-block-600"
-              >
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-white">
-                  {stat.player.name}
-                </td>
-                <td className="px-6 py-4">{stat.totalPositive}</td>
-                <td className="px-6 py-4">{stat.totalNegative}</td>
-              </tr>
-            ))}
+            {stats &&
+              stats.map((stat) => (
+                <tr
+                  key={stat.player.id}
+                  className="bg-block-700 border-b dark:bg-block-700 dark:border-block-600 hover:bg-block-600 dark:hover:bg-block-600"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap font-medium text-white">
+                    {stat.player.name}
+                  </td>
+                  <td className="px-6 py-4">{stat.totalPositive}</td>
+                  <td className="px-6 py-4">{stat.totalNegative}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

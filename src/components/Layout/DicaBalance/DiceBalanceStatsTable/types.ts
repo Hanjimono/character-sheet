@@ -1,10 +1,8 @@
 export interface DiceBalanceStatsTableProps {
   /** Additional classes*/
   className?: string
-  /** Campaign ID */
-  campaignId: number
-  /** Game ID */
-  gameId?: number
+  /** Character ID */
+  characterId: number
   /** Flag to show game stats instead of campaign stats */
   isShowGameStats?: boolean
 }

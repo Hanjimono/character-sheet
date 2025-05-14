@@ -1,31 +1,22 @@
 import { DiceBalancePlayerInfo } from "@/constants/types/dice"
-import { Campaign } from "@/database/models/campaign"
 import { DiceBalance } from "@/database/models/diceBalance"
 import { DiceBalanceHistory } from "@/database/models/diceBalanceHistory"
-import { Game } from "@/database/models/game"
-import { Player } from "@/database/models/player"
+import { withGameContext } from "@/lib/api/context/game"
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const isGameStats = searchParams.get("game")
-  const stats: DiceBalancePlayerInfo[] = []
-  const campaign = await Campaign.getActiveCampaign(Number(characterId || 0))
-  if (!campaign) {
-    return Response.json(stats)
-  }
+export const GET = withGameContext(async ({ req, game, campaign, players }) => {
+  const { searchParams } = new URL(req.url)
+  const isShowGameStats = searchParams.get("isShowGameStats") === "true"
   let gameId
-  if (isGameStats) {
-    const activeGame = await Game.getActiveGame(campaign.id)
-    if (!activeGame) {
-      return Response.json(stats)
+  if (isShowGameStats) {
+    if (!game || !campaign) {
+      throw new Error("No game found")
     }
-    gameId = activeGame.id
+    gameId = game.id
   }
-  const players = await Player.getPlayersForCharacter(Number(characterId || 0))
-  if (!players) {
-    return Response.json(stats)
+  if (!campaign) {
+    throw new Error("No campaign found")
   }
+  const stats: DiceBalancePlayerInfo[] = []
   for (const player of players) {
     const balance = {
       totalPositive: 0,
@@ -53,5 +44,5 @@ export async function GET(request: Request) {
       totalNegative: balance.totalNegative
     })
   }
-  return Response.json(stats)
-}
+  return stats
+})
