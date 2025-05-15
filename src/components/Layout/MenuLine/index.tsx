@@ -1,4 +1,5 @@
 "use client"
+import ImageButton from "@/ui/Actions/ImageButton"
 import Beam from "@/ui/Layout/Beam"
 import SmartImage from "@/ui/Presentation/SmartImage"
 import Text from "@/ui/Presentation/Text"
@@ -8,46 +9,39 @@ import Link from "next/link"
 export default function MenuLine() {
   return (
     <Beam>
-      <MenuItem src="/public/images/backpack.png" title="Вещи" link="items" />
-      <MenuItem
+      <ImageButton
+        src="/public/images/backpack.png"
+        className="w-48 h-48"
+        alt="Рюкзак"
+        title="Вещи"
+        description="Все, что у вас есть"
+        link="items"
+      />
+      <ImageButton
         src="/public/images/HalfBody.png"
+        className="w-48 h-48"
+        alt="Внешность"
         title="Внешность"
+        description="Текстовое описание"
         link="appearance"
       />
-      <MenuItem src="/public/images/Notes.png" title="Записи" link="notes" />
-      <MenuItem
+
+      <ImageButton
+        src="/public/images/Notes.png"
+        className="w-48 h-48"
+        alt="Записи"
+        title="Записи"
+        description="Заметки о кампейне"
+        link="notes"
+      />
+      <ImageButton
         src="/public/images/More Than Half Body.png"
+        className="w-48 h-48"
+        alt="Способности"
         title="Способности"
+        description="Красочное описание"
         link="spells"
       />
     </Beam>
-  )
-}
-
-function MenuItem({
-  src,
-  title,
-  link
-}: {
-  src: string
-  title: string
-  link: string
-}) {
-  return (
-    <Link className="flex flex-col gap-2" href={link}>
-      <motion.div
-        className="w-48 h-48 flex items-center justify-center rounded-lg overflow-hidden cursor-pointer saturate-70 hover:saturate-100 shadow-lg"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ duration: 0.2 }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-      >
-        <SmartImage src={src} alt="" />
-      </motion.div>
-      <Text className="pl-2" size="small">
-        {title}
-      </Text>
-    </Link>
   )
 }
