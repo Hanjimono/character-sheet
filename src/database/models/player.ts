@@ -7,6 +7,7 @@ export class Player extends Model {
   public isMain!: boolean
   public isDM!: boolean
   public characterId!: number
+  public image!: string
 
   // timestamps
   public readonly createdAt!: Date
@@ -53,6 +54,10 @@ Player.init(
     characterId: {
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {
