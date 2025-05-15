@@ -1,9 +1,5 @@
-import { Player } from "@/database/models/player"
+import { withGameContext } from "@/lib/api/context/game"
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const players = await Player.getPlayersForCharacter(Number(characterId) || 0)
-
-  return Response.json({ players })
-}
+export const GET = withGameContext(async ({ players }) => {
+  return players
+})
