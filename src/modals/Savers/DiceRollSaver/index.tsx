@@ -16,6 +16,8 @@ import Beam from "@/ui/Layout/Beam"
 import Button from "@/ui/Actions/Button"
 // Styles and types
 import { DiceRollSaverModalProps } from "./types"
+import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
+import Dice from "@/components/Presentation/Dice"
 
 /**
  * A modal component for saving the result of a critical dice roll.
@@ -38,7 +40,7 @@ function DiceRollSaverModal({
   onClose
 }: DiceRollSaverModalProps) {
   const calculatedClassNames = twMerge(
-    cx("dice-saver box-border min-w-96", className)
+    cx("dice-saver box-border min-w-80", className)
   )
   const [player, setPlayer] = useState<PlayerInfo | undefined>()
   const [saveCriticalRoll] = usePostData(
@@ -64,17 +66,16 @@ function DiceRollSaverModal({
   return (
     <Modal title={title} onClose={onClose} className={calculatedClassNames}>
       <Room>
-        <Text>
-          Which player is rolled a{" "}
-          <span className="font-bold text-gray-400">
-            natural {isNegative ? "1" : "20"}?
-          </span>
-        </Text>
-        <PlayerSelect
-          characterId={characterId}
-          selectedPlayerId={player?.id}
-          onPlayerSelect={setPlayer}
-        />
+        <Beam>
+          <PlayerFrameSelect
+            characterId={characterId}
+            selectedPlayerId={player?.id}
+            onPlayerSelect={setPlayer}
+          />
+          <div className="flex flex-col items-center justify-center ml-4 pointer-events-none">
+            <Dice isPositive={!isNegative} isWithoutCount />
+          </div>
+        </Beam>
         <Beam contentJustify="end">
           <Button onClick={handleSave} disabled={!player}>
             Save

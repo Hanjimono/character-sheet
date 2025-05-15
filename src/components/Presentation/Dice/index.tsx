@@ -15,11 +15,13 @@ import { motion } from "framer-motion"
 export function Dice({
   isPositive,
   count = 0,
-  onClick = (isPositive) => {}
+  onClick = (isPositive) => {},
+  isWithoutCount = false
 }: {
   isPositive: boolean
   count?: number
   onClick?: (isPositive: boolean) => void
+  isWithoutCount?: boolean
 }) {
   return (
     <div className="flex flex-col h-full justify-center content-center items-center">
@@ -48,9 +50,11 @@ export function Dice({
           </span>
         )}
       </motion.div>
-      <div className="w-16 min-h-8 bg-block-600 rounded-md p-1 flex items-center content-center justify-center">
-        {count}
-      </div>
+      {!isWithoutCount && (
+        <div className="w-16 min-h-8 bg-block-600 rounded-md p-1 flex items-center content-center justify-center">
+          {count}
+        </div>
+      )}
     </div>
   )
 }
