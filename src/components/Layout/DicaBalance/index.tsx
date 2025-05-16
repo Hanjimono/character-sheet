@@ -2,7 +2,7 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 // store
 import { useStore } from "@/store"
 // Components
@@ -14,7 +14,7 @@ import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { DiceBalanceProps } from "./types"
-import { DiceBalanceInfo } from "@/constants/types/dice"
+import { DiceBalanceInfo, DiceBalancePlayerInfo } from "@/constants/types/dice"
 import { useFetchAndStoreData } from "@/service/fetcher"
 
 const GET_DICE_BALANCE_API = "/api/stats/rolls/total"
@@ -30,12 +30,7 @@ const GET_DICE_BALANCE_GAME_API = "/api/stats/rolls/game"
  * @param {string} props.characterId - The ID of the character associated with the dice balance.
  * @param {string} props.gameId - The ID of the game associated with the dice balance.
  */
-function DiceBalance({
-  className,
-  campaignId,
-  characterId,
-  gameId
-}: DiceBalanceProps) {
+function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
   const [isShowGameStats, setIsShowGameStats] = useState(false)
   const [balance, loading, fetchBalance] =
     useFetchAndStoreData<DiceBalanceInfo>(
@@ -43,6 +38,18 @@ function DiceBalance({
       undefined,
       characterId
     )
+  const params = useMemo(() => {
+    return {
+      isShowGameStats: isShowGameStats
+    }
+  }, [isShowGameStats])
+  const [stats, statsLoading, fetchStats] = useFetchAndStoreData<
+    DiceBalancePlayerInfo[]
+  >("/api/stats/rolls/table", params, characterId)
+  const fetchAllData = useCallback(() => {
+    fetchBalance()
+    fetchStats()
+  }, [fetchBalance, fetchStats])
   const calculatedClassNames = cx(
     twMerge(
       "dice-balance min-w-full flex justify-center items-center",
@@ -56,7 +63,7 @@ function DiceBalance({
       isNegative: !isPositive,
       characterId: characterId,
       isNotClosable: true,
-      onConfirm: fetchBalance
+      onConfirm: fetchAllData
     })
   }
 
@@ -97,10 +104,7 @@ function DiceBalance({
         </div>
       </Room>
       <HiddenRoom isShown={isShowDetails}>
-        <DiceBalanceStatsTable
-          characterId={characterId}
-          isShowGameStats={isShowGameStats}
-        />
+        <DiceBalanceStatsTable stats={stats || []} />
       </HiddenRoom>
     </>
   )

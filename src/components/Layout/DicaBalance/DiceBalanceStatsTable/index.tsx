@@ -1,14 +1,10 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-import { useMemo } from "react"
-// Service
-import { useFetchAndStoreData } from "@/service/fetcher"
 // ui
 import Title from "@/ui/Presentation/Title"
 // Styles and types
 import { DiceBalanceStatsTableProps } from "./types"
-import { DiceBalancePlayerInfo } from "@/constants/types/dice"
 
 /**
  * Renders a table displaying dice balance statistics for players, including counts of natural 20s and natural 1s.
@@ -19,24 +15,13 @@ import { DiceBalancePlayerInfo } from "@/constants/types/dice"
  */
 function DiceBalanceStatsTable({
   className,
-  characterId,
-  isShowGameStats
+  stats
 }: DiceBalanceStatsTableProps) {
   const calculatedClassNames = cx(
     twMerge(
       "dice-balance-stats-table bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
       className
     )
-  )
-  const params = useMemo(() => {
-    return {
-      isShowGameStats: isShowGameStats
-    }
-  }, [isShowGameStats])
-  const [stats] = useFetchAndStoreData<DiceBalancePlayerInfo[]>(
-    "/api/stats/rolls/table",
-    params,
-    characterId
   )
   return (
     <div className={calculatedClassNames}>

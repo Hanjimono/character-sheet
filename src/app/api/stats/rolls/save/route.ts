@@ -8,8 +8,7 @@ import * as yup from "yup"
 
 const saveRollValidateSchema = yup.object().shape({
   player: yup.number().required(),
-  isNegative: yup.boolean(),
-  test: yup.number().required()
+  isNegative: yup.boolean()
 })
 
 export const POST = withGameContext(async (ctx) =>

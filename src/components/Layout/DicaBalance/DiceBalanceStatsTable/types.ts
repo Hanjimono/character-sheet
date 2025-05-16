@@ -1,8 +1,8 @@
+import { DiceBalancePlayerInfo } from "@/constants/types/dice"
+
 export interface DiceBalanceStatsTableProps {
   /** Additional classes*/
   className?: string
-  /** Character ID */
-  characterId: number
-  /** Flag to show game stats instead of campaign stats */
-  isShowGameStats?: boolean
+  /** Stats for table */
+  stats: DiceBalancePlayerInfo[]
 }

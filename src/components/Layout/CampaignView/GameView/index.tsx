@@ -63,7 +63,6 @@ function GameView({ campaignId, characterId }: GameViewProps) {
       </Room>
       <Room>
         <DiceBalance
-          campaignId={campaignId}
           gameId={!!game ? game.id : undefined}
           characterId={characterId}
         />
