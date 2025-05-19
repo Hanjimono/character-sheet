@@ -170,6 +170,87 @@ export function useFetchAndStoreData<ResponseDataType>(
 }
 
 /**
+ * Custom React hook that provides helper functions and state for handling form data submissions.
+ *
+ * @returns A tuple containing:
+ *   - errorSnack: Function to display an error message.
+ *   - successSnack: Function to display a success message.
+ *   - loading: Boolean indicating if a form submission is in progress.
+ *   - setLoading: Function to set the loading state.
+ */
+export function usePostFormDataHelpers(): [
+  (message: string) => void,
+  (message: string) => void,
+  boolean,
+  Dispatch<SetStateAction<boolean>>
+] {
+  const errorSnack = useStore((state) => state.errorSnack)
+  const successSnack = useStore((state) => state.successSnack)
+  const [loading, setLoading] = useState(false)
+  return [errorSnack, successSnack, loading, setLoading]
+}
+
+/**
+ * Sends a POST request with form data to the specified API endpoint.
+ *
+ * @param api - The API endpoint to send the request to.
+ * @param query - An object containing query parameters to include in the request.
+ * @param formData - An object containing form data to be sent in the request body.
+ * @param characterId - Optional character ID to include in the request.
+ * @param successMessageFunction - Optional callback to display a success message.
+ * @param errorMessageFunction - Optional callback to display an error message.
+ * @param loadingFunction - Optional callback to indicate loading state.
+ * @param successMessage - Optional success message to display upon successful request.
+ * @returns A promise that resolves to `true` if the request was successful, or `false` otherwise.
+ */
+export async function postFormData(
+  api: string,
+  query: Record<string, any> = {},
+  formData: Record<string, any> = {},
+  characterId: number | null = null,
+  successMessageFunction?: (message: string) => void,
+  errorMessageFunction?: (message: string) => void,
+  loadingFunction?: (loading: boolean) => void,
+  successMessage?: string
+): Promise<boolean> {
+  if (loadingFunction) {
+    loadingFunction(true)
+  }
+  try {
+    const response = await doFetching(api, query, characterId, "POST", formData)
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
+    const responseResult: ApiResponse<any> = await response.json()
+    if (!responseResult.success) {
+      if (responseResult.details) {
+        console.error(responseResult.details)
+      }
+      throw new Error(responseResult.error || "An unknown error occurred")
+    }
+    if (loadingFunction) {
+      loadingFunction(false)
+    }
+    if (successMessage && successMessageFunction) {
+      successMessageFunction(successMessage)
+    }
+    return responseResult.success
+  } catch (error) {
+    if (loadingFunction) {
+      loadingFunction(false)
+    }
+    if (errorMessageFunction) {
+      if (error instanceof Error) {
+        errorMessageFunction(error.message)
+      } else {
+        errorMessageFunction("An unknown error occurred")
+      }
+    }
+  }
+  return false
+}
+
+/**
  * A custom hook for making POST requests to a specified API endpoint.
  *
  * @param api - The API endpoint to send the POST request to.
@@ -188,37 +269,28 @@ export function usePostData(
   body: Record<string, any> = {},
   successMessage?: string
 ): [() => Promise<boolean>, boolean] {
-  const [loading, setLoading] = useState(false)
-  const errorSnack = useStore((state) => state.errorSnack)
-  const successSnack = useStore((state) => state.successSnack)
+  const [errorSnack, successSnack, loading, setLoading] =
+    usePostFormDataHelpers()
   const postData = useCallback(async () => {
-    setLoading(true)
-    try {
-      const response = await doFetching(api, query, characterId, "POST", body)
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
-      }
-      const responseResult: ApiResponse<any> = await response.json()
-      if (!responseResult.success) {
-        if (responseResult.details) {
-          console.error(responseResult.details)
-        }
-        throw new Error(responseResult.error || "An unknown error occurred")
-      }
-      setLoading(false)
-      if (successMessage) {
-        successSnack(successMessage)
-      }
-      return responseResult.success
-    } catch (error) {
-      setLoading(false)
-      if (error instanceof Error) {
-        errorSnack(error.message)
-      } else {
-        errorSnack("An unknown error occurred")
-      }
-    }
-    return false
-  }, [api, errorSnack, characterId, body, query, successMessage, successSnack])
+    return postFormData(
+      api,
+      query,
+      body,
+      characterId,
+      successSnack,
+      errorSnack,
+      setLoading,
+      successMessage
+    )
+  }, [
+    api,
+    errorSnack,
+    characterId,
+    body,
+    query,
+    successMessage,
+    successSnack,
+    setLoading
+  ])
   return [postData, loading]
 }

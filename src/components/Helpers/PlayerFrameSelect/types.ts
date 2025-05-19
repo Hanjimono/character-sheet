@@ -19,7 +19,7 @@ export interface PlayerFramePortraitProps {
   /** Selected player info */
   player?: PlayerInfo
   /** Callback function for frame click */
-  onClick?: (player?: PlayerInfo) => void
+  onClick?: (e: React.MouseEvent<HTMLDivElement>, player?: PlayerInfo) => void
   /** Default title for the image */
   defaultTitle?: string
   /** Default description for the image */

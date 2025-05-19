@@ -57,3 +57,27 @@ export interface MoneyBalancePlayerInfo {
   /** The transaction history for the player's money balance in currently active game */
   history: MoneyHistory[]
 }
+
+/**
+ * Represents a request to change the amount of money for one or more players.
+ */
+export interface MoneyChangeRequest {
+  /** The ID of the player from whom the money is being transferred.
+   * ![NOTE] If it's not a transfer, this can be read just as player not from or to
+   */
+  fromPlayerId?: number
+  /** The ID of the player to whom the money is being transferred.
+   * ![NOTE] It's is used only for transfer
+   */
+  toPlayerId?: number
+  /** The amount of money to be changed in copper. */
+  count: number
+  /** Indicates if the money change is negative (debit) or positive (credit). */
+  isNegative?: boolean
+  /** Indicates if the money change is a transfer between players. */
+  isTransfer?: boolean
+  /** Comment or description associated with the money change. */
+  comment: string
+  /** Indicates if the money change is related to common funds. */
+  isCommon?: boolean
+}

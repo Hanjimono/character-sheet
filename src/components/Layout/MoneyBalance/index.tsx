@@ -18,7 +18,10 @@ import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Title from "@/ui/Presentation/Title"
 // Styles and types
 import { MoneyBalanceProps } from "./types"
-import { MoneyBalanceInfo } from "@/constants/types/money"
+import {
+  MoneyBalanceInfo,
+  MoneyBalancePlayerInfo
+} from "@/constants/types/money"
 
 /**
  * Displays the money balance for a campaign, including common funds and players totals.
@@ -41,11 +44,18 @@ function MoneyBalance({ className, characterId, gameId }: MoneyBalanceProps) {
       null,
       characterId
     )
+  const [stats, statsLoading, fetchStats] = useFetchAndStoreData<
+    MoneyBalancePlayerInfo[]
+  >("/api/money/stats", null, characterId)
   const [isShowDetails, setIsShowDetails] = useState(false)
   const openModal = useStore((state) => state.openModal)
   useEffect(() => {
     fetchBalance()
   }, [fetchBalance])
+  const handleDataFetch = () => {
+    fetchBalance()
+    fetchStats()
+  }
   const handleChangeMoney = (
     isNegative: boolean = false,
     isTransfer: boolean = false,
@@ -56,8 +66,7 @@ function MoneyBalance({ className, characterId, gameId }: MoneyBalanceProps) {
       isNegative,
       isTransfer,
       isCommon,
-      isNotClosable: true,
-      onConfirm: fetchBalance
+      onConfirm: handleDataFetch
     })
   }
   return (
@@ -107,7 +116,7 @@ function MoneyBalance({ className, characterId, gameId }: MoneyBalanceProps) {
         </Beam>
       </Room>
       <HiddenRoom isShown={isShowDetails && !!gameId}>
-        <MoneyBalanceStatsTable characterId={characterId} />
+        <MoneyBalanceStatsTable stats={stats || []} />
       </HiddenRoom>
     </>
   )

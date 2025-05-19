@@ -1,23 +1,33 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// Styles and types
-import { MoneyChangeSaverModalProps } from "./types"
-import Modal from "@/ui/Navigation/Modal"
-import Room from "@/ui/Layout/Room"
-import PlayerSelect from "@/components/Helpers/PlayerSelect"
+import * as yup from "yup"
 import { useState } from "react"
-import { PlayerInfo } from "@/constants/types/players"
+// Services
+import { postFormData, usePostFormDataHelpers } from "@/service/fetcher"
+// Components
+import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
+// Ui
+import Icon from "@/ui/Presentation/Icon"
+import Title from "@/ui/Presentation/Title"
+import Brick from "@/ui/Layout/Brick"
+import FormElementWrapper, {
+  FormContextElementWrapper,
+  FormElementNestedWrapper
+} from "@/ui/Form/FormElementWrapper"
 import Beam from "@/ui/Layout/Beam"
-import FormField from "@/ui/Form/Field"
 import Input from "@/ui/Form/Input"
 import Form from "@/ui/Form/Form"
 import CoinSign from "@/components/Helpers/CoinSign"
 import FormSubmit from "@/ui/Form/FormSubmit"
 import Button from "@/ui/Actions/Button"
-import * as yup from "yup"
+import Modal from "@/ui/Navigation/Modal"
+// Utils
 import { transformCoinsToCopper } from "@/utils"
-import { useStore } from "@/store"
+// Styles and types
+import { MoneyChangeSaverModalProps } from "./types"
+import { PlayerInfo } from "@/constants/types/players"
+import { CoinType } from "@/constants/types/money"
 
 const formValues = {
   platinum: yup.number().nullable(),
@@ -25,9 +35,23 @@ const formValues = {
   gold: yup.number().nullable(),
   silver: yup.number().nullable(),
   copper: yup.number().nullable(),
-  comment: yup.string()
+  comment: yup.string().required("Comment is required")
 }
 
+//TODO: add some specific styles for operations with common funds
+/**
+ * Modal component for handling money changes (add, remove, or transfer) for a character or common funds.-
+ *
+ * @param {string} [props.className] - Additional class names for styling the modal.
+ * @param {() => void} props.onClose - Callback to close the modal.
+ * @param {string} props.characterId - The ID of the character for whom the money change is being made.
+ * @param {boolean} props.isNegative - If true, the operation is a removal of money.
+ * @param {boolean} props.isTransfer - If true, the operation is a transfer between players.
+ * @param {boolean} props.isCommon - If true, the operation affects common funds.
+ * @param {() => void} [props.onConfirm] - Optional callback invoked after a successful save.
+ *
+ * @returns {JSX.Element} The rendered modal component for changing money.
+ */
 function MoneyChangeSaverModal({
   className,
   onClose,
@@ -38,114 +62,140 @@ function MoneyChangeSaverModal({
   onConfirm
 }: MoneyChangeSaverModalProps) {
   const calculatedClassNames = cx(
-    twMerge("money-change-saver-modal", className)
+    twMerge(
+      "money-change-saver-modal bg-transparent max-w-100",
+      isTransfer && "max-w-160",
+      className
+    )
   )
-  const successSnack = useStore((state) => state.successSnack)
-  const errorSnack = useStore((state) => state.errorSnack)
+  const [errorSnack, successSnack] = usePostFormDataHelpers()
   const title = isTransfer
-    ? "Transfer money to another player"
+    ? "Transfer money to player"
     : isNegative
-      ? "Remove money from player"
-      : "Add money to player"
+      ? "Remove money"
+      : "Add money"
   const [fromPlayer, setFromPlayer] = useState<PlayerInfo | undefined>()
   const [toPlayer, setToPlayer] = useState<PlayerInfo | undefined>()
   const handleConfirm = async (data: any) => {
-    const { platinum, electrum, gold, silver, copper, comment } = data
+    const { gold, silver, copper, comment } = data
     const money = transformCoinsToCopper({
-      platinum: Number(platinum) || 0,
-      electrum: Number(electrum) || 0,
+      platinum: 0,
+      electrum: 0,
       gold: Number(gold) || 0,
       silver: Number(silver) || 0,
       copper: Number(copper) || 0
     })
-    try {
-      const response = await fetch(
-        `/api/money/change?character=${characterId}`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            money: isNegative ? -money : money,
-            fromPlayerId: fromPlayer?.id,
-            toPlayerId: toPlayer?.id,
-            count: money,
-            isTransfer,
-            isCommon,
-            isNegative,
-            comment
-          }),
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      )
-      const result = await response.json()
-      if (!result.success) {
-        errorSnack(result.error || "Failed to save money change")
-        return
-      }
-    } catch (error) {
-      errorSnack("Failed to save money change")
-      return
+    const saveResult = await postFormData(
+      `/api/money/change`,
+      undefined,
+      {
+        money: isNegative ? -money : money,
+        fromPlayerId: fromPlayer?.id,
+        toPlayerId: toPlayer?.id,
+        count: money,
+        isTransfer,
+        isCommon,
+        isNegative,
+        comment
+      },
+      characterId,
+      successSnack,
+      errorSnack,
+      undefined,
+      "Money change saved"
+    )
+    if (saveResult) {
+      onConfirm?.()
+      onClose()
     }
-    successSnack("Money change saved")
-    onConfirm?.()
-    onClose()
   }
+  const fromPlayerId = fromPlayer?.id
+  const toPlayerId = toPlayer?.id
   return (
-    <Modal title={title} onClose={onClose} className={calculatedClassNames}>
-      <Room>
-        <Beam>
-          <FormField>
-            <PlayerSelect
-              characterId={characterId}
-              label={isTransfer ? "From Player" : "Player"}
-              onPlayerSelect={setFromPlayer}
-              selectedPlayerId={fromPlayer?.id}
-            />
-          </FormField>
+    <Modal className={calculatedClassNames}>
+      <Form
+        onSubmit={handleConfirm}
+        validationSchema={yup.object(formValues)}
+        useContext
+      >
+        <Title
+          className="w-full"
+          uppercase
+          size={1}
+          bottomGap="same"
+          align="center"
+        >
+          {title}
+        </Title>
+        <Beam contentJustify="center" contentAlign="center" withoutWrap>
+          <PlayerFrameSelect
+            className="w-42 h-42"
+            characterId={characterId}
+            onPlayerSelect={setFromPlayer}
+            selectedPlayerId={fromPlayerId}
+            playersIdsToExclude={toPlayerId ? [toPlayerId] : []}
+          />
+          {isTransfer && <Icon type="md" name="sync_alt" size={32}></Icon>}
           {isTransfer && (
-            <FormField>
-              <PlayerSelect
-                characterId={characterId}
-                label={"To player"}
-                onPlayerSelect={setToPlayer}
-                selectedPlayerId={toPlayer?.id}
-              />
-            </FormField>
+            <PlayerFrameSelect
+              className="w-42 h-42"
+              characterId={characterId}
+              onPlayerSelect={setToPlayer}
+              selectedPlayerId={toPlayerId}
+              playersIdsToExclude={fromPlayerId ? [fromPlayerId] : []}
+            />
           )}
+          <Brick durability={7} className="w-36 flex flex-col gap-same-level">
+            <CoinInput type="copper" />
+            <CoinInput type="silver" />
+            <CoinInput type="gold" />
+          </Brick>
         </Beam>
-        <Beam>
-          <Form
-            onSubmit={handleConfirm}
-            validationSchema={yup.object(formValues)}
-          >
-            <span className="text-gray-400 w-12 h-full">
-              <CoinSign type="platinum" />
-            </span>
-            <Input name="platinum" label="platinum" md={1} />
-            <span className="text-gray-400 w-12 h-full">
-              <CoinSign type="electrum" />
-            </span>
-            <Input name="electrum" label="electrum" md={1} />
-            <span className="text-gray-400 w-12 h-full">
-              <CoinSign type="gold" />
-            </span>
-            <Input name="gold" label="gold" md={1} />
-            <span className="text-gray-400 w-12 h-full">
-              <CoinSign type="silver" />
-            </span>
-            <Input name="silver" label="silver" md={1} />
-            <span className="text-gray-400 w-12 h-full">
-              <CoinSign type="copper" />
-            </span>
-            <Input name="copper" label="copper" md={1} />
-            <Input name="comment" label="Comment" md={12} />
-            <FormSubmit>Save</FormSubmit>
-            <Button onClick={onClose}>Cancel</Button>
-          </Form>
-        </Beam>
-      </Room>
+        <FormElementNestedWrapper>
+          <Beam contentJustify="center" contentAlign="center">
+            <Brick className={cx(twMerge("w-86", "w-142"))} durability={7}>
+              <FormElementWrapper>
+                <Input
+                  className="mb-same-level"
+                  name="comment"
+                  label="Comment"
+                  md={12}
+                />
+              </FormElementWrapper>
+              <Beam contentJustify="end">
+                <FormElementWrapper>
+                  <FormSubmit>Save</FormSubmit>
+                </FormElementWrapper>
+                <Button onClick={onClose}>Cancel</Button>
+              </Beam>
+            </Brick>
+          </Beam>
+        </FormElementNestedWrapper>
+      </Form>
     </Modal>
+  )
+}
+
+/**
+ * Renders an input field for a specific coin type, displaying the coin sign and an input box.
+ *
+ * @param type - The type of coin to display and accept input for.
+ */
+function CoinInput({ type }: { type: CoinType }) {
+  return (
+    <div className="h-8 flex align-center justify-center">
+      <CoinSign type={type} />
+      <FormContextElementWrapper>
+        <Input
+          className="h-8 w-18 ml-close"
+          name={type}
+          label={type}
+          labelOnTop
+          withoutFormField
+          placeholder="0"
+        />
+      </FormContextElementWrapper>
+    </div>
   )
 }
 export default MoneyChangeSaverModal

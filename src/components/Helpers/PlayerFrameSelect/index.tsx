@@ -45,13 +45,18 @@ function PlayerFrameSelect({
   const selectedPlayer = players?.find(
     (player) => player.id === selectedPlayerId
   )
-  const handleOpenPlayerSelect = () => {
+  const handleOpenPlayerSelect = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     if (selectPlayerRef.current) {
       setSelectPlayerPosition(selectPlayerRef.current.getBoundingClientRect())
     }
     setIsSelectPlayersOpen(true)
   }
-  const handleSelectPlayer = (player?: PlayerInfo) => {
+  const handleSelectPlayer = (
+    e: React.MouseEvent<HTMLDivElement>,
+    player?: PlayerInfo
+  ) => {
+    e.stopPropagation()
     setIsSelectPlayersOpen(false)
     if (onPlayerSelect) {
       onPlayerSelect(player)
@@ -60,7 +65,6 @@ function PlayerFrameSelect({
   return (
     <div className={calculatedClassNames} ref={selectPlayerRef}>
       <PlayerFramePortrait
-        className="w-32 h-32"
         player={selectedPlayer}
         onClick={handleOpenPlayerSelect}
       />
@@ -78,9 +82,7 @@ function PlayerFrameSelect({
             <div className="w-24 h-24">
               <PlayerFramePortrait
                 defaultTitle="Empty"
-                onClick={() => {
-                  handleSelectPlayer()
-                }}
+                onClick={handleSelectPlayer}
                 isUsingOnlyDescription
               />
             </div>
@@ -96,9 +98,7 @@ function PlayerFrameSelect({
               <div key={player.id} className="w-24 h-24">
                 <PlayerFramePortrait
                   player={player}
-                  onClick={() => {
-                    handleSelectPlayer(player)
-                  }}
+                  onClick={handleSelectPlayer}
                   isUsingOnlyDescription
                 />
               </div>
@@ -135,7 +135,7 @@ function PlayerFramePortrait({
     ? player.shortname || player.name.split(" ")[0]
     : defaultTitle
   return (
-    <div className={calculatedClassNames} onClick={() => onClick?.(player)}>
+    <div className={calculatedClassNames} onClick={(e) => onClick?.(e, player)}>
       <ImageButton
         alt="select"
         src={playerImage}

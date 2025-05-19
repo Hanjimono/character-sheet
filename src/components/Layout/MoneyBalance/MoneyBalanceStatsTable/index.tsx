@@ -18,18 +18,13 @@ import { MoneyBalancePlayerInfo } from "@/constants/types/money"
  */
 function MoneyBalanceStatsTable({
   className,
-  characterId
+  stats
 }: MoneyBalanceStatsTableProps) {
   const calculatedClassNames = cx(
     twMerge(
       "money-balance-stats bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
       className
     )
-  )
-  const [stats] = useFetchAndStoreData<MoneyBalancePlayerInfo[]>(
-    "/api/money/stats",
-    null,
-    characterId
   )
   return (
     <div className={calculatedClassNames}>
@@ -62,11 +57,19 @@ function MoneyBalanceStatsTable({
                     className={cx(
                       twMerge(
                         "flex justify-between items-center w-full px-2 py-0.5 rounded-md mb-2",
-                        history.isNegative ? "bg-red-800" : "bg-green-700"
+                        history.isNegative ? "bg-red-800/25" : "bg-green-700/25"
                       )
                     )}
                   >
-                    <span className="text-gray-400">{history.comment}</span>
+                    <span className="text-gray-400">
+                      {history.comment}
+                      {history.isTransfer && (
+                        <span className="text-gray-400">
+                          {history.isNegative && ` (->${history.toPlayer})`}
+                          {!history.isNegative && ` (<-${history.fromPlayer})`}
+                        </span>
+                      )}
+                    </span>
                     <span className="text-gray-200">
                       <MoneyRender amount={history.amount} />
                     </span>

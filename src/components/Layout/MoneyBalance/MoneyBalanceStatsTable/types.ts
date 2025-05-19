@@ -1,6 +1,8 @@
+import { MoneyBalancePlayerInfo } from "@/constants/types/money"
+
 export interface MoneyBalanceStatsTableProps {
   /** Classes */
   className?: string
-  /** Id of the character for campaign. */
-  characterId?: number
+  /** Stats of the money balance */
+  stats: MoneyBalancePlayerInfo[]
 }

@@ -68,8 +68,8 @@ export class MoneyBalanceHistory extends Model {
       transaction
     )
     await MoneyBalanceHistory.saveBalanceChange(
-      toPlayerId,
       fromPlayerId,
+      toPlayerId,
       campaignId,
       gameId,
       count,
