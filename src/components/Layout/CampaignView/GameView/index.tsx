@@ -61,20 +61,20 @@ function GameView({ campaignId, characterId }: GameViewProps) {
           </div>
         )}
       </Room>
-      <Room>
+      <Room className="w-full">
         <DiceBalance
           gameId={!!game ? game.id : undefined}
           characterId={characterId}
         />
       </Room>
-      <Room>
+      <Room className="w-full">
         <MoneyBalance
           campaignId={campaignId}
           gameId={!!game ? game.id : undefined}
           characterId={characterId}
         />
       </Room>
-      <Room>
+      <Room className="w-full">
         <DamageBalance
           campaignId={campaignId}
           gameId={!!game ? game.id : undefined}

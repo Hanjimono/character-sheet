@@ -1,40 +1,22 @@
 import { DamageBalancePlayerInfo } from "@/constants/types/damage"
-import { Campaign } from "@/database/models/campaign"
 import { DamageBalance } from "@/database/models/damageBalance"
 import { DamageBalanceHistory } from "@/database/models/damageBalanceHistory"
-import { Game } from "@/database/models/game"
-import { Player } from "@/database/models/player"
+import { withGameContext } from "@/lib/api/context/game"
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const isGameStats = searchParams.get("game")
-  const stats: DamageBalancePlayerInfo[] = []
-  const campaign = await Campaign.getActiveCampaign(Number(characterId || 0))
+export const GET = withGameContext(async ({ campaign, game, players }) => {
   if (!campaign) {
-    return Response.json(stats)
+    throw new Error("No campaign found")
   }
-  let gameId
-  if (isGameStats) {
-    const activeGame = await Game.getActiveGame(campaign.id)
-    if (!activeGame) {
-      return Response.json(stats)
-    }
-    gameId = activeGame.id
-  }
-  const players = await Player.getPlayersForCharacter(Number(characterId || 0))
-  if (!players) {
-    return Response.json(stats)
-  }
+  const stats: DamageBalancePlayerInfo[] = []
   for (const player of players) {
     const balance = {
       totalPositive: 0,
       totalNegative: 0
     }
-    if (gameId) {
+    if (game) {
       const gameBalance = await DamageBalanceHistory.getDamageSum(
         campaign.id,
-        gameId,
+        game.id,
         player.id
       )
       balance.totalPositive = gameBalance.totalPositive
@@ -53,5 +35,5 @@ export async function GET(request: Request) {
       totalNegative: balance.totalNegative
     })
   }
-  return Response.json(stats)
-}
+  return stats
+})

@@ -1,23 +1,16 @@
-import { Campaign } from "@/database/models/campaign"
 import { DamageBalanceHistory } from "@/database/models/damageBalanceHistory"
-import { DiceBalance } from "@/database/models/diceBalance"
-import { DiceBalanceHistory } from "@/database/models/diceBalanceHistory"
-import { Game } from "@/database/models/game"
+import { withGameContext } from "@/lib/api/context/game"
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const characterId = searchParams.get("character")
-  const campaign = await Campaign.getActiveCampaign(Number(characterId || 0))
+export const GET = withGameContext(async ({ campaign, game, players }) => {
   if (!campaign) {
-    return Response.json({ totalPositive: 0, totalNegative: 0 })
+    throw new Error("No campaign or game found")
   }
-  const activeGame = await Game.getActiveGame(campaign.id)
-  if (!activeGame) {
-    return Response.json({ totalPositive: 0, totalNegative: 0 })
+  if (!game) {
+    return { totalPositive: 0, totalNegative: 0 }
   }
   const balanceTotal = await DamageBalanceHistory.getDamageSum(
     campaign.id,
-    activeGame.id
+    game.id
   )
-  return Response.json({ ...balanceTotal })
-}
+  return balanceTotal
+})

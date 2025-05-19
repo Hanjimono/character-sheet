@@ -1,18 +1,20 @@
 // System
-// Styles and types
 import { cx } from "class-variance-authority"
-import { DamageBalanceStatsTableProps } from "./types"
 import { twMerge } from "tailwind-merge"
-import Room from "@/ui/Layout/Room"
-import { useCallback, useEffect, useState } from "react"
-import { DamageBalancePlayerInfo } from "@/constants/types/damage"
+// Ui
 import Title from "@/ui/Presentation/Title"
+// Styles and types
+import { DamageBalanceStatsTableProps } from "./types"
 
+/**
+ * Renders a table displaying damage balance statistics for a list of players.
+ *
+ * @param {string} [props.className] - Optional additional class names to apply to the table container.
+ * @param {Array} props.stats - An array of player statistics objects, each containing player information and their damage dealt and taken.
+ */
 function DamageBalanceStatsTable({
   className,
-  campaignId,
-  gameId,
-  isShowGameStats = true
+  stats
 }: DamageBalanceStatsTableProps) {
   const calculatedClassNames = cx(
     twMerge(
@@ -20,22 +22,6 @@ function DamageBalanceStatsTable({
       className
     )
   )
-  const [stats, setStats] = useState<DamageBalancePlayerInfo[]>([])
-  const fetchData = useCallback(async () => {
-    const response = await fetch(
-      "/api/stats/damage/table" +
-        `?character=${campaignId}` +
-        `&game=${isShowGameStats}`
-    )
-    if (!response.ok) {
-      return
-    }
-    const data = await response.json()
-    setStats(data as DamageBalancePlayerInfo[])
-  }, [campaignId, isShowGameStats])
-  useEffect(() => {
-    fetchData()
-  }, [fetchData, isShowGameStats])
   return (
     <div className={calculatedClassNames}>
       <div className="flex flex-col gap-2 overflow-visible">

@@ -2,24 +2,34 @@
 import { useCallback, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { cx } from "class-variance-authority"
+import * as yup from "yup"
 // Constants
-import { PlayerInfo } from "@/constants/types/players"
-// Store
-import { useStore } from "@/store"
 // Components
-import PlayerSelect from "@/components/Helpers/PlayerSelect"
+import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
+// Services
+import { postFormData, usePostFormDataHelpers } from "@/service/fetcher"
 // Ui
 import Modal from "@/ui/Navigation/Modal"
-import Room from "@/ui/Layout/Room"
-import Text from "@/ui/Presentation/Text"
 import Beam from "@/ui/Layout/Beam"
 import Button from "@/ui/Actions/Button"
-// Styles and types
-import { DamageSaverModalProps } from "./types"
+import Title from "@/ui/Presentation/Title"
+import FormElementWrapper, {
+  FormElementNestedWrapper
+} from "@/ui/Form/FormElementWrapper"
 import Form from "@/ui/Form/Form"
 import Input from "@/ui/Form/Input"
 import FormSubmit from "@/ui/Form/FormSubmit"
 import Checkbox from "@/ui/Form/Checkbox"
+import Brick from "@/ui/Layout/Brick"
+// Styles and types
+import { DamageSaverModalProps } from "./types"
+import { PlayerInfo } from "@/constants/types/players"
+
+const formValues = {
+  comment: yup.string().required("Comment is required"),
+  count: yup.number().required("Count is required"),
+  isSummon: yup.boolean()
+}
 
 /**
  * A modal component for saving the result of getting or dealing damage.
@@ -38,86 +48,90 @@ function DamageSaverModal({
   onConfirm,
   isNegative,
   characterId,
-  title = "Save result of Critical damage",
+  title = "Save Damage stats",
   onClose
 }: DamageSaverModalProps) {
-  const successSnack = useStore((state) => state.successSnack)
-  const errorSnack = useStore((state) => state.errorSnack)
+  const [errorSnack, successSnack] = usePostFormDataHelpers()
   const calculatedClassNames = twMerge(
-    cx("damage-saver box-border min-w-96", className)
+    cx("damage-saver box-border w-117 bg-transparent", className)
   )
   const [player, setPlayer] = useState<PlayerInfo | undefined>()
-  const handleSave = useCallback(
-    async (data: any) => {
-      if (!player) {
-        return
-      }
-      const { count, comment, isSummon } = data
-      try {
-        const response = await fetch(
-          "/api/stats/damage/save?character=" + characterId,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              player: player.id,
-              isNegative: isNegative,
-              count: Number(count) || 0,
-              comment: comment || null,
-              isSummon: isSummon || false
-            }),
-            headers: {
-              "Content-Type": "application/json"
-            }
-          }
-        )
-        const data = await response.json()
-        if (!data.success) {
-          errorSnack("Error saving damage")
-          onClose()
-          return
-        }
-        successSnack(`Damage saved for ${player.name}`)
-        if (!!onConfirm) {
-          onConfirm()
-        }
-        onClose()
-      } catch (error) {
-        errorSnack("Error saving damage")
-        onClose()
-      }
-    },
-    [
+  const handleSave = async (data: any) => {
+    if (!player) {
+      return
+    }
+    const { count, comment, isSummon } = data
+    const damageSaveResult = await postFormData(
+      "/api/stats/damage/save",
+      undefined,
+      {
+        player: player.id,
+        isNegative: isNegative,
+        count: Number(count) || 0,
+        comment: comment || null,
+        isSummon: isSummon || false
+      },
       characterId,
-      player,
-      onClose,
-      onConfirm,
-      isNegative,
+      successSnack,
       errorSnack,
-      successSnack
-    ]
-  )
+      undefined,
+      `Damage saved for ${player.name}`
+    )
+    if (damageSaveResult) {
+      if (!!onConfirm) {
+        onConfirm()
+      }
+      onClose()
+    }
+  }
   return (
-    <Modal title={title} onClose={onClose} className={calculatedClassNames}>
-      <Room>
-        <Text>
-          Which player is{" "}
-          <span className="font-bold text-gray-400">
-            {isNegative ? "taken damage" : "dealing damage"}?
-          </span>
-        </Text>
-        <PlayerSelect
-          characterId={characterId}
-          selectedPlayerId={player?.id}
-          onPlayerSelect={setPlayer}
-        />
-        <Form onSubmit={handleSave}>
-          <Input name="count" label="count" />
-          <Input name="comment" label="comment" />
-          <Checkbox name="isSummon" label="Summon" />
-          <FormSubmit disabled={!player}>Save</FormSubmit>
-          <Button onClick={onClose}>Cancel</Button>
-        </Form>
-      </Room>
+    <Modal className={calculatedClassNames}>
+      <Form onSubmit={handleSave} validationSchema={yup.object(formValues)}>
+        <Title
+          className="w-full"
+          uppercase
+          size={1}
+          bottomGap="same"
+          align="center"
+        >
+          {title}
+        </Title>
+        <FormElementNestedWrapper>
+          <Beam>
+            <PlayerFrameSelect
+              className="w-32 h-32"
+              characterId={characterId}
+              onPlayerSelect={setPlayer}
+              selectedPlayerId={player?.id}
+            />
+            <Brick durability={7} className="gap-same-level flex flex-col">
+              <FormElementWrapper>
+                <Input
+                  name="count"
+                  label="Damage count"
+                  icon={isNegative ? "shield" : "swords"}
+                />
+                <Checkbox name="isSummon" label="Check if it's not a player" />
+              </FormElementWrapper>
+            </Brick>
+          </Beam>
+        </FormElementNestedWrapper>
+        <FormElementNestedWrapper>
+          <Brick durability={7} className="gap-same-level flex flex-col" whole>
+            <FormElementWrapper>
+              <Input name="comment" label="comment" />
+            </FormElementWrapper>
+            <Beam contentJustify="end">
+              <FormElementWrapper>
+                <FormSubmit disabled={!player}>Save</FormSubmit>
+                <Button onClick={onClose} transparent>
+                  Cancel
+                </Button>
+              </FormElementWrapper>
+            </Beam>
+          </Brick>
+        </FormElementNestedWrapper>
+      </Form>
     </Modal>
   )
 }
