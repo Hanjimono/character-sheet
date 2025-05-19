@@ -40,7 +40,7 @@ function DiceRollSaverModal({
   onClose
 }: DiceRollSaverModalProps) {
   const calculatedClassNames = twMerge(
-    cx("dice-saver box-border min-w-80", className)
+    cx("dice-saver box-border min-w-80 bg-block-700", className)
   )
   const [player, setPlayer] = useState<PlayerInfo | undefined>()
   const [saveCriticalRoll] = usePostData(
@@ -64,7 +64,7 @@ function DiceRollSaverModal({
     }
   }, [player, saveCriticalRoll, onConfirm, onClose])
   return (
-    <Modal title={title} onClose={onClose} className={calculatedClassNames}>
+    <Modal title={title} className={calculatedClassNames}>
       <Room>
         <Beam>
           <PlayerFrameSelect
@@ -80,7 +80,9 @@ function DiceRollSaverModal({
           <Button onClick={handleSave} disabled={!player}>
             Save
           </Button>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose} transparent>
+            Cancel
+          </Button>
         </Beam>
       </Room>
     </Modal>

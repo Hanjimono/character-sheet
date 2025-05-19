@@ -52,11 +52,18 @@ function GameView({ campaignId, characterId }: GameViewProps) {
       <Room className="w-full">
         {!game && <Button onClick={handleStartNewGame}>Start new game</Button>}
         {!!game && (
-          <div className="min-w-full h-12 bg-block-800 rounded-lg">
+          <div className="min-w-full h-12 bg-block-700 rounded-lg">
             <div className="flex justify-between items-center h-full px-4">
               <span className="text-gray-400">Game playing:</span>
               <GameTimer game={game} />
-              <Button onClick={handleEndGame}>End game</Button>
+              <Button
+                className="py-2 px-4"
+                onClick={handleEndGame}
+                isCustomSize
+                isNoPadding
+              >
+                End game
+              </Button>
             </div>
           </div>
         )}

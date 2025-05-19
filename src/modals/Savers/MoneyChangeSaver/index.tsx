@@ -166,7 +166,9 @@ function MoneyChangeSaverModal({
                 <FormElementWrapper>
                   <FormSubmit>Save</FormSubmit>
                 </FormElementWrapper>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose} transparent>
+                  Cancel
+                </Button>
               </Beam>
             </Brick>
           </Beam>

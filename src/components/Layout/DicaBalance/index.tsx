@@ -62,7 +62,6 @@ function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
     openModal("diceRollSaver", {
       isNegative: !isPositive,
       characterId: characterId,
-      isNotClosable: true,
       onConfirm: fetchAllData
     })
   }
@@ -70,13 +69,13 @@ function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
   return (
     <>
       <Room className={calculatedClassNames}>
-        <div className="flex w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
+        <div className="flex w-full min-w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
           <Dice
             isPositive={false}
             onClick={handleSaveDiceRoll}
             count={balance ? balance.totalNegative || 0 : 0}
           />
-          <div className="flex flex-col h-full justify-center content-center items-center px-4">
+          <div className="flex flex-col flex-1 h-full justify-center content-center items-center px-4">
             <span className="text-2xl bold">Critical Rolls</span>
             <Switch
               name="total-critical-rolls"

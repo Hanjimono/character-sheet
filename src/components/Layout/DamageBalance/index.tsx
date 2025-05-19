@@ -68,13 +68,13 @@ function DamageBalance({ className, characterId }: DamageBalanceProps) {
   return (
     <>
       <Room className={calculatedClassNames}>
-        <div className="relative p-4 flex w-fit justify-center items-center h-32 rounded-md shadow-sm shadow-block-600 bg-block-700">
+        <div className="relative p-4 flex w-full min-w-fit justify-center items-center h-32 rounded-md shadow-sm shadow-block-600 bg-block-700">
           <DamageStatButton
             count={balance?.totalPositive || 0}
             onClick={handleSaveDiceRoll}
             isPositive
           />
-          <div className="flex flex-col h-full content-center items-center px-4 relative">
+          <div className="flex flex-col flex-1 h-full content-center items-center px-4 relative">
             <Title bottomGap="almost-same">Damage</Title>
             <Text size="small">Dealt and Taken</Text>
             <Button
