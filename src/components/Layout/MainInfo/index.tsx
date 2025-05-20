@@ -10,7 +10,7 @@ export default function MainInfo() {
         <DataLine title="Имя:" data="Сар'Таэль Верин'Келот" />
         <DataLine title="Раса:" data="Дроу" />
         <DataLine title="Класс:" data="Варлок (патрон Бездонный)" />
-        <DataLine title="Уровень:" data="3" />
+        <DataLine title="Уровень:" data="4" />
         <DataLine title="Возраст:" data="32" />
         <DataLine title="Языки:" data="Всеобщий, эльфийский, подземный" />
       </div>

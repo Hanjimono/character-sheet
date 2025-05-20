@@ -36,4 +36,5 @@ yarn-error.log*
 next-env.d.ts
 .vscode
 public/images
+public/json
 database.sqlite

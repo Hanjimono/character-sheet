@@ -109,6 +109,22 @@
   --radius-button: 0.5rem;
 }
 
+@layer utilities {
+  .soft-edges {
+    -webkit-mask-image:
+      linear-gradient(to top, transparent, black 15%, black 85%, transparent),
+      linear-gradient(to left, transparent, black 15%, black 85%, transparent);
+    -webkit-mask-composite: intersect;
+    mask-image:
+      linear-gradient(to top, transparent, black 15%, black 85%, transparent),
+      linear-gradient(to left, transparent, black 15%, black 85%, transparent);
+    mask-composite: intersect;
+    mask-mode: alpha;
+    mask-repeat: no-repeat;
+    mask-size: cover;
+  }
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
