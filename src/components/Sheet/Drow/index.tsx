@@ -10,7 +10,6 @@ import Pillar from "@/ui/Layout/Pillar"
 export default function DrowDiaryPage() {
   return (
     <Beam>
-      <Beam bottomGap="other-level-large" />
       <Pillar lg={8} md={12} xs={12}>
         <CharacterLeftPartView />
       </Pillar>

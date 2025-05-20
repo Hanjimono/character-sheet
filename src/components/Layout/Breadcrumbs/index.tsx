@@ -7,7 +7,7 @@ import Link from "next/link"
 
 function BreadCrumbs({ className, title, items }: BreadCrumbsProps) {
   const calculatedClassNames = cx(
-    twMerge("flex items-center gap-2 py-4 text-lg", className)
+    twMerge("flex items-center gap-2 pb-4 text-lg", className)
   )
   return (
     <div className={calculatedClassNames}>

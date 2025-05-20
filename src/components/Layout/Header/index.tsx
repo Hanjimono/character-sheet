@@ -6,9 +6,7 @@ import { HeaderProps } from "./types"
 import SmartImage from "@/ui/Presentation/SmartImage"
 
 function Header({ className, title }: HeaderProps) {
-  const calculatedClassNames = twMerge(
-    cx("absolute top-0 left-0 right-0 bg-block-400 h-24", className)
-  )
+  const calculatedClassNames = twMerge(cx("bg-block-400 h-32", className))
   return (
     <div className={calculatedClassNames}>
       <SmartImage

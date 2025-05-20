@@ -8,7 +8,7 @@ const BREADCRUMBS = [{ title: "Персонаж", href: "/" }]
 
 export default function SpellsPage() {
   return (
-    <WallDecorated animationMode="slide-both-sides">
+    <WallDecorated animationMode="slide-both-sides" isShortYPadding>
       <BreadCrumbs title="Способности" items={BREADCRUMBS} />
       <DrowSpellsPage />
     </WallDecorated>

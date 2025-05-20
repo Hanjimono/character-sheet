@@ -35,9 +35,11 @@ export default function RootLayout({
       </head>
       <body className={openSans.className}>
         <Foundation>
-          <Beam withoutWrap whole withoutGap>
-            <Header />
-            <Frame className="main-content">{children}</Frame>
+          <Beam className="flex-col" withoutWrap whole withoutGap>
+            <Frame className="main-content">
+              <Header />
+              {children}
+            </Frame>
           </Beam>
         </Foundation>
         <Initializer />
