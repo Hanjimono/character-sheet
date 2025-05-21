@@ -1,4 +1,5 @@
 import { Campaign } from "@/database/models/campaign"
+import { Character } from "@/database/models/character"
 import { Game } from "@/database/models/game"
 import { Player } from "@/database/models/player"
 
@@ -20,6 +21,8 @@ export interface ApiCampaignContext {
   req: Request
   /** The ID of the character associated with the request */
   characterId: number
+  /** The character associated with the request */
+  character: Character | null
   /** The active game for the character, if any */
   campaign: Campaign | null
 }
@@ -34,6 +37,8 @@ export interface BaseApiContext {
 export interface ApiGameContext extends BaseApiContext {
   /** The ID of the character associated with the request */
   characterId: number
+  /** The character associated with the request */
+  character: Character | null
   /** The active campaign for the character, if any */
   campaign: Campaign | null
   /** The active game for the campaign, if any */

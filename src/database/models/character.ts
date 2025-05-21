@@ -4,6 +4,7 @@ import sequelize from "@/lib/sequlize"
 export class Character extends Model {
   public id!: number
   public name!: string
+  public obsidianPath!: string
 
   // timestamps
   public readonly createdAt!: Date
@@ -18,6 +19,10 @@ Character.init(
       primaryKey: true
     },
     name: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    obsidianPath: {
       type: DataTypes.STRING,
       allowNull: false
     }

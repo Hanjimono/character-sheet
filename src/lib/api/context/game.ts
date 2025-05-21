@@ -3,6 +3,7 @@ import { apiHandler } from "../handler"
 import { getCampaignForCharacterId, getCharacterIdFromRequest } from "./helpers"
 import { Game } from "@/database/models/game"
 import { Player } from "@/database/models/player"
+import { Character } from "@/database/models/character"
 
 /**
  * A wrapper for API handlers that provides the game context.
@@ -17,6 +18,11 @@ export function withGameContext<T>(
       ? await Game.getActiveGame(campaign.id)
       : null
     const players: Player[] = await Player.getPlayersForCharacter(characterId)
-    return handler({ req, characterId, campaign, game, players })
+    const character = await Character.findOne({
+      where: {
+        id: characterId
+      }
+    })
+    return handler({ req, characterId, campaign, game, players, character })
   })
 }
