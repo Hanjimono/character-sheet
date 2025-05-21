@@ -8,6 +8,7 @@ import { useFetchAndStoreData } from "@/service/fetcher"
 import { NotesListForCategory } from "@/constants/types/notes"
 // Styles and types
 import { NotesCategoryContentProps } from "./types"
+import ObsidianNote from "../ObsidianNote"
 
 /**
  * Renders the content for a specific notes category, displaying a list of notes
@@ -24,7 +25,12 @@ function NotesCategoryContent({
   folder,
   characterId
 }: NotesCategoryContentProps) {
-  const calculatedClassNames = cx(twMerge("NotesCategoryContent", className))
+  const calculatedClassNames = cx(
+    twMerge(
+      "notes-category-content flex flex-col gap-other-level py-4",
+      className
+    )
+  )
   const params = useMemo(() => {
     return { folder }
   }, [folder])
@@ -36,13 +42,11 @@ function NotesCategoryContent({
   return (
     <div className={calculatedClassNames}>
       {notesList?.notesNames.map((noteName) => (
-        <div key={noteName} className="p-2">
-          <h3 className="text-lg font-bold">{noteName}</h3>
-          <div
-            className="prose prose-sm"
-            dangerouslySetInnerHTML={{ __html: notesList.notesList[noteName] }}
-          />
-        </div>
+        <ObsidianNote
+          key={noteName}
+          title={noteName}
+          content={notesList.notesList[noteName]}
+        />
       ))}
     </div>
   )
