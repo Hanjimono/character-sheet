@@ -37,7 +37,8 @@ function SkillDiceRoll({ className, roll, damageType }: SkillDiceRollProps) {
         )}
         {roll.numberOfDice && (
           <span className="flex items-center">
-            {roll.numberOfDice}d{roll.diceType} {roll.modifier && "+"}{" "}
+            {roll.numberOfDice}d{roll.diceType}{" "}
+            {roll.modifier && "+" + roll.modifier}
           </span>
         )}
         {!roll.numberOfDice && (

@@ -23,7 +23,7 @@ import { SkillCardProps } from "./types"
 function SkillCard({ className, skill }: SkillCardProps) {
   const calculatedClassNames = cx(
     twMerge(
-      "skill-card flex gap-same-level bg-block-700 rounded-xl p-4 max-w-230",
+      "skill-card flex gap-same-level bg-block-700 rounded-xl p-4 max-w-230 h-fit max-h-fit",
       className
     )
   )

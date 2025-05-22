@@ -2,22 +2,32 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// Components
+import SkillLongList from "./SkillLongList"
+// Ui
+import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { SkillListProps } from "./types"
-import SkillCard from "./SkillCard"
+import { useState } from "react"
+import SkillSelectList from "./SkillSelectList"
 
 function SkillList({ className, skills }: SkillListProps) {
   const calculatedClassNames = cx(
-    twMerge(
-      "skill-list flex flex-col w-full h-full overflow-auto gap-other-level",
-      className
-    )
+    twMerge("skill-list-wrapper flex flex-col gap-same-level", className)
   )
+  const [isShowAllView, setIsShowAllView] = useState(true)
   return (
     <div className={calculatedClassNames}>
-      {skills.map((skill) => (
-        <SkillCard key={skill.name} skill={skill} />
-      ))}
+      <Switch
+        name="view"
+        onChange={(name, value: boolean) => {
+          setIsShowAllView(value)
+        }}
+        checked={isShowAllView}
+        label="Show all skills as cards"
+      />
+      {isShowAllView && <SkillLongList skills={skills} />}
+      {!isShowAllView && <SkillSelectList skills={skills} />}
     </div>
   )
 }
