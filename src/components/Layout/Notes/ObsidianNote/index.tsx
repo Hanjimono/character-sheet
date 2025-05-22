@@ -15,7 +15,10 @@ import Button from "@/ui/Actions/Button"
  */
 function ObsidianNote({ className, title, content }: ObsidianNoteProps) {
   const calculatedClassNames = cx(
-    twMerge("obsidian-note bg-block-600 rounded-2xl overflow-hidden", className)
+    twMerge(
+      "obsidian-note bg-block-700 rounded-2xl overflow-hidden w-full",
+      className
+    )
   )
   const [isShowContent, setIsShowContent] = useState(false)
   return (
@@ -27,9 +30,9 @@ function ObsidianNote({ className, title, content }: ObsidianNoteProps) {
         {title}
       </div>
       {isShowContent && (
-        <div className="note-content overflow-auto relative">
+        <div className="note-content overflow-hidden relative w-full">
           <div
-            className="prose prose-sm py-4 pl-12 pr-4 overflow-y-auto max-h-80 h-fit"
+            className="prose-obsidian flex flex-col py-4 pl-12 pr-4 overflow-y-auto overflow-x-hidden max-h-80 h-fit min-w-full whitespace-pre"
             dangerouslySetInnerHTML={{ __html: content }}
           />
           <Button
