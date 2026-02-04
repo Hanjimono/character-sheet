@@ -125,7 +125,7 @@
     mask-size: cover;
   }
   .prose-obsidian {
-    @apply prose prose-invert prose-code:text-wrap prose-em:text-block-300 prose-li:text-wrap;
+    @apply prose prose-invert prose-code:text-wrap prose-em:text-block-300 prose-li:text-wrap prose-pre:min-h-fit;
   }
 }
 
