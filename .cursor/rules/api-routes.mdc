@@ -82,9 +82,10 @@ return error("Error message", errorDetails, statusCode)
 
 ## Validation
 
-- Use Yup schemas for request validation
+- **Note**: Legacy API routes use Yup schemas for validation (via `withPostValidateContext`)
+- **Standard**: Use Zod for all new validation. Prefer tRPC (which uses Zod) over REST API routes
 - Define schemas above the route handler
-- Use `withPostValidateContext` for POST/PUT requests
+- Use `withPostValidateContext` for POST/PUT requests (legacy - still uses Yup)
 
 ## Database Operations
 

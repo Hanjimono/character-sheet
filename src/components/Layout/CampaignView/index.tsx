@@ -12,9 +12,9 @@ import GameView from "./GameView"
 import Beam from "@/ui/Layout/Beam"
 import Title from "@/ui/Presentation/Title"
 import Text from "@/ui/Presentation/Text"
+import Stack from "@/ui/Layout/Stack"
 // Styles and types
 import { CampaignViewProps } from "./types"
-import Stack from "@/ui/Layout/Stack"
 
 /**
  * CampaignView component displays the active campaign for a character.

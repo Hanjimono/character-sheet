@@ -6,26 +6,21 @@ import { useState } from "react"
 // Lib
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
-// store
+// Store
 import { useStore } from "@/store"
 // Components
 import MoneyBalanceStatsTable from "./MoneyBalanceStatsTable"
 import MoneyRender from "@/components/Helpers/MoneyRender"
-// ui
-import Beam from "@/ui/Layout/Beam"
+// Ui
 import Button from "@/ui/Actions/Button"
 import Text from "@/ui/Presentation/Text"
 import Divider from "@/ui/Presentation/Divider"
 import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Title from "@/ui/Presentation/Title"
-// Styles and types
-import { MoneyBalanceProps } from "./types"
-import {
-  MoneyBalanceInfo,
-  MoneyBalancePlayerInfo
-} from "@/constants/types/money"
 import Inline from "@/ui/Layout/Inline"
 import Stack from "@/ui/Layout/Stack"
+// Styles and types
+import { MoneyBalanceProps } from "./types"
 
 /**
  * Displays the money balance for a campaign, including common funds and players totals.

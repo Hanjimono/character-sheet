@@ -1,6 +1,6 @@
 "use client"
 // System
-import { useCallback, useState } from "react"
+import { useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { cx } from "class-variance-authority"
 import { z } from "zod"
@@ -24,10 +24,11 @@ import Input from "@/ui/Form/Input"
 import FormSubmit from "@/ui/Form/FormSubmit"
 import Checkbox from "@/ui/Form/Checkbox"
 import Brick from "@/ui/Layout/Brick"
+import Inline from "@/ui/Layout/Inline"
+// Constants
+import { PlayerInfo } from "@/constants/types/players"
 // Styles and types
 import { DamageSaverModalProps } from "./types"
-import { PlayerInfo } from "@/constants/types/players"
-import Inline from "@/ui/Layout/Inline"
 
 const damageSaverSchema = z.object({
   comment: z.string().min(1, "Comment is required"),

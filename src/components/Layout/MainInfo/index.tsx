@@ -1,7 +1,8 @@
-import Beam from "@/ui/Layout/Beam"
+// System
+import { motion } from "framer-motion"
+// Ui
 import Inline from "@/ui/Layout/Inline"
 import SmartImage from "@/ui/Presentation/SmartImage"
-import { motion } from "framer-motion"
 
 export default function MainInfo() {
   return (

@@ -2,8 +2,9 @@
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
 // Components
-import { transformMoneyFromCopperToCoins } from "@/utils"
 import CoinSign from "../CoinSign"
+// Utils
+import { transformMoneyFromCopperToCoins } from "@/utils"
 // Styles and types
 import { MoneyRenderProps } from "./types"
 

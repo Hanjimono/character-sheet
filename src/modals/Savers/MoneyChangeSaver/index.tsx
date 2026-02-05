@@ -19,21 +19,22 @@ import FormElementWrapper, {
   FormContextElementWrapper,
   FormElementNestedWrapper
 } from "@/ui/Form/FormElementWrapper"
-import Beam from "@/ui/Layout/Beam"
 import Input from "@/ui/Form/Input"
 import Form from "@/ui/Form/Form"
-import CoinSign from "@/components/Helpers/CoinSign"
 import FormSubmit from "@/ui/Form/FormSubmit"
 import Button from "@/ui/Actions/Button"
 import Modal from "@/ui/Navigation/Modal"
-// Utils
-import { transformCoinsToCopper } from "@/utils"
-// Styles and types
-import { MoneyChangeSaverModalProps } from "./types"
-import { PlayerInfo } from "@/constants/types/players"
-import { CoinType } from "@/constants/types/money"
 import Stack from "@/ui/Layout/Stack"
 import Inline from "@/ui/Layout/Inline"
+// Components
+import CoinSign from "@/components/Helpers/CoinSign"
+// Utils
+import { transformCoinsToCopper } from "@/utils"
+// Constants
+import { PlayerInfo } from "@/constants/types/players"
+import { CoinType } from "@/constants/types/money"
+// Styles and types
+import { MoneyChangeSaverModalProps } from "./types"
 
 const optionalNumber = z
   .union([z.number(), z.string()])

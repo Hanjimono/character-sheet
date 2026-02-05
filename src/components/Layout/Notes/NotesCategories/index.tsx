@@ -1,11 +1,11 @@
 "use client"
-// system
+// System
 import { useState } from "react"
-// components
+// Components
 import NotesCategoryContent from "../NoteCategoryContent"
-// ui
+// Ui
 import TabPanel from "@/ui/Navigation/TabPanel"
-// constants
+// Constants
 import { NOTES_CATEGORIES } from "@/constants/notes"
 
 /**

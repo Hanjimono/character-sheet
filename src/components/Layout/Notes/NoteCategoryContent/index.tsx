@@ -5,9 +5,10 @@ import { twMerge } from "tailwind-merge"
 // Lib
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Components
+import ObsidianNote from "../ObsidianNote"
 // Styles and types
 import { NotesCategoryContentProps } from "./types"
-import ObsidianNote from "../ObsidianNote"
 
 /**
  * Renders the content for a specific notes category, displaying a list of notes

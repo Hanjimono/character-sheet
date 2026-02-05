@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Components
 import ImportantNote from "@/components/Layout/Notes/ImportantNote"
-// Types
+// Styles and types
 import { ImportantNotesProps } from "./types"
 
 /**

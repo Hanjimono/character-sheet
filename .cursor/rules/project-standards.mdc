@@ -44,6 +44,8 @@ import styles from "./styles.module.scss"
 - Use `@/*` alias for imports from `src/*`
 - Example: `import Button from "@/ui/Actions/Button"`
 
+**Note**: The `src/ui` folder is a separate package/module with its own structure. Import UI components directly from `@/ui/*` paths.
+
 ## File Naming
 
 - Components: PascalCase (e.g., `Header.tsx`, `ModalContainer.tsx`)

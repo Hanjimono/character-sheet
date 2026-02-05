@@ -6,18 +6,18 @@ import { useState } from "react"
 // Lib
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
-// store
+// Store
 import { useStore } from "@/store"
 // Components
 import DiceBalanceStatsTable from "./DiceBalanceStatsTable"
 import Dice from "@/components/Presentation/Dice"
+// Ui
 import Button from "@/ui/Actions/Button"
-// ui
 import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
+import Stack from "@/ui/Layout/Stack"
 // Styles and types
 import { DiceBalanceProps } from "./types"
-import Stack from "@/ui/Layout/Stack"
 
 /**
  * Responsible for displaying and managing the balance of dice rolls

@@ -1,10 +1,10 @@
 // System
-import clsx from "clsx"
-// Styles and types
-import { AbilityProps } from "./types"
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// Ui
 import SmartImage from "@/ui/Presentation/SmartImage"
+// Styles and types
+import { AbilityProps } from "./types"
 
 function Ability({
   className,

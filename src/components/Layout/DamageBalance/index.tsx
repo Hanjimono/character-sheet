@@ -17,9 +17,9 @@ import Text from "@/ui/Presentation/Text"
 import SmartImage from "@/ui/Presentation/SmartImage"
 import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Button from "@/ui/Actions/Button"
+import Stack from "@/ui/Layout/Stack"
 // Styles and types
 import { DamageBalanceProps } from "./types"
-import Stack from "@/ui/Layout/Stack"
 
 /**
  * Renders the DamageBalance component, which displays the total damage dealt and taken

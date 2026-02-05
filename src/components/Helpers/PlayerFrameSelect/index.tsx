@@ -9,9 +9,10 @@ import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Ui
 import ImageButton from "@/ui/Actions/ImageButton"
 import PortalPopupAppearTransition from "@/ui/Skeleton/Transition/PortalPopupAppearTransition"
+// Constants
+import { PlayerInfo } from "@/constants/types/players"
 // Styles and types
 import { PlayerFramePortraitProps, PlayerFrameSelectProps } from "./types"
-import { PlayerInfo } from "@/constants/types/players"
 
 /**
  * Displays a selectable player portrait frame.

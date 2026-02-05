@@ -1,6 +1,7 @@
 "use server"
-
+// Components
 import SkillList from "@/components/Layout/SkillList"
+// Constants
 import { SkillInfo } from "@/constants/types/skills"
 
 export default async function DrowSpells() {

@@ -5,12 +5,11 @@ import { twMerge } from "tailwind-merge"
 import Modal from "@/ui/Navigation/Modal"
 import Room from "@/ui/Layout/Room"
 import Text from "@/ui/Presentation/Text"
-import Beam from "@/ui/Layout/Beam"
-// Styles and types
-import { ConfirmModalProps } from "./types"
 import Button from "@/ui/Actions/Button"
 import Stack from "@/ui/Layout/Stack"
 import Inline from "@/ui/Layout/Inline"
+// Styles and types
+import { ConfirmModalProps } from "./types"
 
 /**
  * Renders a confirm modal dialog with customizable text, title, and action buttons.

@@ -72,9 +72,55 @@ Follow the project's JSDoc pattern for component documentation:
 
 ## Form Handling
 
-- Use `react-hook-form` with `yup` validation
+- Use `react-hook-form` with `zod` validation
 - Wrap forms with `Form` component from `@/ui/Form/Form`
 - Use form elements from `@/ui/Form/*`
+- Define validation schemas using Zod
+
+**Form Pattern:**
+
+```typescript
+import { z } from "zod"
+import Form from "@/ui/Form/Form"
+import Input from "@/ui/Form/Input"
+import FormSubmit from "@/ui/Form/FormSubmit"
+
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  age: z.coerce.number().min(0, "Age must be positive")
+})
+
+function MyForm() {
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    // Handle form submission
+  }
+  
+  return (
+    <Form
+      onSubmit={handleSubmit}
+      validationSchema={
+        formSchema as z.ZodType<
+          z.infer<typeof formSchema>,
+          z.infer<typeof formSchema>
+        >
+      }
+    >
+      <Input name="name" label="Name" />
+      <Input name="email" label="Email" />
+      <Input name="age" label="Age" />
+      <FormSubmit>Submit</FormSubmit>
+    </Form>
+  )
+}
+```
+
+**Key Points:**
+- Use `z.object()` to define form schemas
+- Use `z.coerce.number()` for numeric inputs that come as strings
+- Use `z.infer<typeof schema>` to infer TypeScript types from schemas
+- Pass validation schema with proper type casting to `validationSchema` prop
+- Form uses `standardSchemaResolver` from `@hookform/resolvers/standard-schema` internally
 
 ## Data Fetching
 

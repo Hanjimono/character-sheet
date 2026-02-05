@@ -8,7 +8,6 @@ import Beam from "@/ui/Layout/Beam"
 // styles and types
 import styles from "./styles.module.scss"
 import Button from "@/ui/Actions/Button"
-import Title from "@/ui/Presentation/Title"
 import Logo from "../Logo"
 
 const MENU = [

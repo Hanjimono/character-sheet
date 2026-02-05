@@ -1,7 +1,7 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// ui
+// Ui
 import Note from "@/ui/Presentation/Note"
 // Styles and types
 import { ImportantNoteProps } from "./types"

@@ -2,14 +2,15 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// System
+import { useState } from "react"
 // Components
 import SkillLongList from "./SkillLongList"
+import SkillSelectList from "./SkillSelectList"
 // Ui
 import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { SkillListProps } from "./types"
-import { useState } from "react"
-import SkillSelectList from "./SkillSelectList"
 
 function SkillList({ className, skills }: SkillListProps) {
   const calculatedClassNames = cx(

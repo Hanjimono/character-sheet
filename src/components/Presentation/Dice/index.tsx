@@ -1,5 +1,5 @@
 "use client"
-// system
+// System
 import { motion } from "framer-motion"
 
 /**

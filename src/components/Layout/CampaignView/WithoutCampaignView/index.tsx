@@ -1,5 +1,5 @@
 "use client"
-
+// Ui
 import Note from "@/ui/Presentation/Note"
 
 export default function WithoutCampaignView() {

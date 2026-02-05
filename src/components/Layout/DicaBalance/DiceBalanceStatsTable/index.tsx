@@ -1,7 +1,7 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// ui
+// Ui
 import Title from "@/ui/Presentation/Title"
 // Styles and types
 import { DiceBalanceStatsTableProps } from "./types"

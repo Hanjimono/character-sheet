@@ -1,11 +1,12 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// ui
+// Ui
 import SmartImage from "@/ui/Presentation/SmartImage"
+// Constants
+import { SkillSavingThrow } from "@/constants/types/skills"
 // Styles and types
 import { SkillDifficultyProps } from "./types"
-import { SkillSavingThrow } from "@/constants/types/skills"
 
 /**
  * Renders a circular skill difficulty indicator with a dice icon and displays either a saving throw DC or a hit modifier.

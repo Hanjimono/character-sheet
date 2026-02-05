@@ -11,9 +11,10 @@ import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Ui
 import Room from "@/ui/Layout/Room"
 import Button from "@/ui/Actions/Button"
+// Constants
+import { GameInfo } from "@/constants/types/game"
 // Styles and types
 import { GameViewProps } from "./types"
-import { GameInfo } from "@/constants/types/game"
 
 /**
  * The `GameView` component is responsible for managing and displaying the state of a game

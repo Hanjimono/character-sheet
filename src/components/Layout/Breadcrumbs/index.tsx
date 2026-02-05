@@ -1,9 +1,9 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+import Link from "next/link"
 // Styles and types
 import { BreadCrumbsProps } from "./types"
-import Link from "next/link"
 
 function BreadCrumbs({ className, title, items }: BreadCrumbsProps) {
   const calculatedClassNames = cx(

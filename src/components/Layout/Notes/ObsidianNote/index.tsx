@@ -1,10 +1,12 @@
 // System
+// System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+import { useState } from "react"
+// Ui
+import Button from "@/ui/Actions/Button"
 // Styles and types
 import { ObsidianNoteProps } from "./types"
-import { useState } from "react"
-import Button from "@/ui/Actions/Button"
 
 /**
  * Renders an note from Obsidian with a collapsible content area.

@@ -6,7 +6,7 @@ import SkillDiceRoll from "./SkillDiceRoll"
 import SkillTime from "./SkillTime"
 import SkillDifficulty from "./SkillDifficulty"
 import SkillSlider from "./SkillSlider"
-// ui
+// Ui
 import Title from "@/ui/Presentation/Title"
 import SmartImage from "@/ui/Presentation/SmartImage"
 import Text from "@/ui/Presentation/Text"
