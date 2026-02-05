@@ -1,10 +1,11 @@
 import Beam from "@/ui/Layout/Beam"
+import Inline from "@/ui/Layout/Inline"
 import SmartImage from "@/ui/Presentation/SmartImage"
 import { motion } from "framer-motion"
 
 export default function MainInfo() {
   return (
-    <Beam>
+    <Inline>
       <MainAvatar />
       <div className="flex flex-col gap-close flex-1 max-w-96 py-2">
         <DataLine title="Имя:" data="Сар'Таэль Верин'Келот" />
@@ -44,7 +45,7 @@ export default function MainInfo() {
           />
         </motion.a>
       </div>
-    </Beam>
+    </Inline>
   )
 }
 

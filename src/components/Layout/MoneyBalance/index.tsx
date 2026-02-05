@@ -24,6 +24,8 @@ import {
   MoneyBalanceInfo,
   MoneyBalancePlayerInfo
 } from "@/constants/types/money"
+import Inline from "@/ui/Layout/Inline"
+import Stack from "@/ui/Layout/Stack"
 
 /**
  * Displays the money balance for a campaign, including common funds and players totals.
@@ -69,55 +71,55 @@ function MoneyBalance({ className, characterId, gameId }: MoneyBalanceProps) {
     })
   }
   return (
-    <>
-      <Room className={calculatedClassNames} noGap>
-        <Beam className="relative">
-          <Title size={3} bottomGap="almost-same">
-            Money Balance
-          </Title>
-          <Button
-            className="absolute right-0 top-0 text-sm text-gray-300"
-            endIcon={isShowDetails ? "arrow_drop_up" : "arrow_drop_down"}
-            onClick={() => setIsShowDetails((prev) => !prev)}
-            text
-          >
-            details
-          </Button>
-        </Beam>
-        <Beam contentAlign="center">
-          <Text className="text-gray-400" size="small">
-            Common funds:
-          </Text>
-          <MoneyRender
-            className="bg-block-800 py-2 px-3 rounded-lg"
-            amount={moneyBalance ? moneyBalance.common : 0}
-            isShowZero
-          />
-          <MoneyBalanceActionPanel
-            handleChangeMoney={handleChangeMoney}
-            isCommon
-          />
-        </Beam>
-        <Divider gap="almost-same" />
-        <Beam contentAlign="center">
-          <Title size={4} bottomGap="same" className="text-gray-400">
-            Players total:
-          </Title>
-          <MoneyRender
-            className="bg-block-800 py-2 px-3 rounded-lg"
-            amount={moneyBalance ? moneyBalance.total : 0}
-            isShowZero
-          />
-          <MoneyBalanceActionPanel
-            handleChangeMoney={handleChangeMoney}
-            isCommon={false}
-          />
-        </Beam>
+    <Stack>
+      <Room className={calculatedClassNames}>
+        <Stack gap="close">
+          <Inline className="relative">
+            <Title size={3}>Money Balance</Title>
+            <Button
+              className="absolute right-0 top-0 text-sm text-gray-300"
+              endIcon={isShowDetails ? "arrow_drop_up" : "arrow_drop_down"}
+              onClick={() => setIsShowDetails((prev) => !prev)}
+              isText
+            >
+              details
+            </Button>
+          </Inline>
+          <Inline className="justify-center">
+            <Text className="text-gray-400" size="small">
+              Common funds:
+            </Text>
+            <MoneyRender
+              className="bg-block-800 py-2 px-3 rounded-lg"
+              amount={moneyBalance ? moneyBalance.common : 0}
+              isShowZero
+            />
+            <MoneyBalanceActionPanel
+              handleChangeMoney={handleChangeMoney}
+              isCommon
+            />
+          </Inline>
+          <Divider />
+          <Inline className="justify-center">
+            <Title size={4} className="text-gray-400">
+              Players total:
+            </Title>
+            <MoneyRender
+              className="bg-block-800 py-2 px-3 rounded-lg"
+              amount={moneyBalance ? moneyBalance.total : 0}
+              isShowZero
+            />
+            <MoneyBalanceActionPanel
+              handleChangeMoney={handleChangeMoney}
+              isCommon={false}
+            />
+          </Inline>
+        </Stack>
       </Room>
       <HiddenRoom isShown={isShowDetails && !!gameId}>
         <MoneyBalanceStatsTable stats={stats || []} />
       </HiddenRoom>
-    </>
+    </Stack>
   )
 }
 
@@ -151,19 +153,19 @@ function MoneyBalanceActionPanel({
       <Button
         className="h-6 w-6"
         icon="add"
-        text
+        isText
         onClick={() => handleChangeMoney(false, false, isCommon)}
       />
       <Button
         className="h-6 w-6"
         icon="remove"
-        text
+        isText
         onClick={() => handleChangeMoney(true, false, isCommon)}
       />
       <Button
         className="h-6 w-6"
         icon="swap_horiz"
-        text
+        isText
         onClick={() => handleChangeMoney(false, true, isCommon)}
       />
     </div>

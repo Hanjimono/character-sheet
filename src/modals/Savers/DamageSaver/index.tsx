@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { cx } from "class-variance-authority"
-import * as yup from "yup"
+import { z } from "zod"
 // Lib
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
@@ -27,12 +27,13 @@ import Brick from "@/ui/Layout/Brick"
 // Styles and types
 import { DamageSaverModalProps } from "./types"
 import { PlayerInfo } from "@/constants/types/players"
+import Inline from "@/ui/Layout/Inline"
 
-const formValues = {
-  comment: yup.string().required("Comment is required"),
-  count: yup.number().required("Count is required"),
-  isSummon: yup.boolean()
-}
+const damageSaverSchema = z.object({
+  comment: z.string().min(1, "Comment is required"),
+  count: z.coerce.number().min(0, "Count is required"),
+  isSummon: z.boolean().optional().default(false)
+})
 
 /**
  * A modal component for saving the result of getting or dealing damage.
@@ -71,7 +72,7 @@ function DamageSaverModal({
       errorSnack(error.message || "Failed to save damage")
     }
   })
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: z.infer<typeof damageSaverSchema>) => {
     if (!player) {
       return
     }
@@ -79,25 +80,27 @@ function DamageSaverModal({
     saveDamageMutation.mutate({
       player: player.id,
       isNegative: isNegative,
-      count: Number(count) || 0,
-      comment: comment || null,
+      count: count || 0,
+      comment: comment,
       isSummon: isSummon || false
     })
   }
   return (
     <Modal className={calculatedClassNames}>
-      <Form onSubmit={handleSave} validationSchema={yup.object(formValues)}>
-        <Title
-          className="w-full"
-          uppercase
-          size={1}
-          bottomGap="same"
-          align="center"
-        >
+      <Form
+        onSubmit={handleSave}
+        validationSchema={
+          damageSaverSchema as z.ZodType<
+            z.infer<typeof damageSaverSchema>,
+            z.infer<typeof damageSaverSchema>
+          >
+        }
+      >
+        <Title className="w-full" uppercase size={1} align="center">
           {title}
         </Title>
         <FormElementNestedWrapper>
-          <Beam>
+          <Inline>
             <PlayerFrameSelect
               className="w-32 h-32"
               characterId={characterId}
@@ -114,14 +117,14 @@ function DamageSaverModal({
                 <Checkbox name="isSummon" label="Check if it's not a player" />
               </FormElementWrapper>
             </Brick>
-          </Beam>
+          </Inline>
         </FormElementNestedWrapper>
         <FormElementNestedWrapper>
           <Brick durability={7} className="gap-same-level flex flex-col" whole>
             <FormElementWrapper>
               <Input name="comment" label="comment" />
             </FormElementWrapper>
-            <Beam contentJustify="end">
+            <Inline className="justify-end">
               <FormElementWrapper>
                 <FormSubmit disabled={!player || saveDamageMutation.isPending}>
                   Save
@@ -130,7 +133,7 @@ function DamageSaverModal({
                   Cancel
                 </Button>
               </FormElementWrapper>
-            </Beam>
+            </Inline>
           </Brick>
         </FormElementNestedWrapper>
       </Form>

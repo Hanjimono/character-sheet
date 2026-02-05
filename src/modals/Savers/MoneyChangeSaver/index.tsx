@@ -2,8 +2,8 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-import * as yup from "yup"
 import { useState } from "react"
+import { z } from "zod"
 // Lib
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
@@ -32,15 +32,22 @@ import { transformCoinsToCopper } from "@/utils"
 import { MoneyChangeSaverModalProps } from "./types"
 import { PlayerInfo } from "@/constants/types/players"
 import { CoinType } from "@/constants/types/money"
+import Stack from "@/ui/Layout/Stack"
+import Inline from "@/ui/Layout/Inline"
 
-const formValues = {
-  platinum: yup.number().nullable(),
-  electrum: yup.number().nullable(),
-  gold: yup.number().nullable(),
-  silver: yup.number().nullable(),
-  copper: yup.number().nullable(),
-  comment: yup.string().required("Comment is required")
-}
+const optionalNumber = z
+  .union([z.number(), z.string()])
+  .transform((v) => (v === "" || v === undefined ? null : Number(v)))
+  .nullable()
+
+const moneyChangeSchema = z.object({
+  platinum: optionalNumber,
+  electrum: optionalNumber,
+  gold: optionalNumber,
+  silver: optionalNumber,
+  copper: optionalNumber,
+  comment: z.string().min(1, "Comment is required")
+})
 
 //TODO: add some specific styles for operations with common funds
 /**
@@ -92,7 +99,7 @@ function MoneyChangeSaverModal({
       errorSnack(error.message || "Failed to save money change")
     }
   })
-  const handleConfirm = async (data: any) => {
+  const handleConfirm = async (data: z.infer<typeof moneyChangeSchema>) => {
     const { gold, silver, copper, comment } = data
     const money = transformCoinsToCopper({
       platinum: 0,
@@ -117,66 +124,67 @@ function MoneyChangeSaverModal({
     <Modal className={calculatedClassNames}>
       <Form
         onSubmit={handleConfirm}
-        validationSchema={yup.object(formValues)}
+        validationSchema={
+          moneyChangeSchema as z.ZodType<
+            z.infer<typeof moneyChangeSchema>,
+            z.infer<typeof moneyChangeSchema>
+          >
+        }
         useContext
       >
-        <Title
-          className="w-full"
-          uppercase
-          size={1}
-          bottomGap="same"
-          align="center"
-        >
-          {title}
-        </Title>
-        <Beam contentJustify="center" contentAlign="center" withoutWrap>
-          <PlayerFrameSelect
-            className="w-42 h-42"
-            characterId={characterId}
-            onPlayerSelect={setFromPlayer}
-            selectedPlayerId={fromPlayerId}
-            playersIdsToExclude={toPlayerId ? [toPlayerId] : []}
-          />
-          {isTransfer && <Icon type="md" name="sync_alt" size={32}></Icon>}
-          {isTransfer && (
+        <Stack>
+          <Title className="w-full" uppercase size={1} align="center">
+            {title}
+          </Title>
+          <Inline className="justify-center items-center">
             <PlayerFrameSelect
               className="w-42 h-42"
               characterId={characterId}
-              onPlayerSelect={setToPlayer}
-              selectedPlayerId={toPlayerId}
-              playersIdsToExclude={fromPlayerId ? [fromPlayerId] : []}
+              onPlayerSelect={setFromPlayer}
+              selectedPlayerId={fromPlayerId}
+              playersIdsToExclude={toPlayerId ? [toPlayerId] : []}
             />
-          )}
-          <Brick durability={7} className="w-36 flex flex-col gap-same-level">
-            <CoinInput type="copper" />
-            <CoinInput type="silver" />
-            <CoinInput type="gold" />
-          </Brick>
-        </Beam>
-        <FormElementNestedWrapper>
-          <Beam contentJustify="center" contentAlign="center">
-            <Brick className={cx(twMerge("w-86", "w-142"))} durability={7}>
-              <FormElementWrapper>
-                <Input
-                  className="mb-same-level"
-                  name="comment"
-                  label="Comment"
-                  md={12}
-                />
-              </FormElementWrapper>
-              <Beam contentJustify="end">
-                <FormElementWrapper>
-                  <FormSubmit disabled={changeMoneyMutation.isPending}>
-                    Save
-                  </FormSubmit>
-                </FormElementWrapper>
-                <Button onClick={onClose} transparent>
-                  Cancel
-                </Button>
-              </Beam>
+            {isTransfer && <Icon type="md" name="sync_alt" size={32}></Icon>}
+            {isTransfer && (
+              <PlayerFrameSelect
+                className="w-42 h-42"
+                characterId={characterId}
+                onPlayerSelect={setToPlayer}
+                selectedPlayerId={toPlayerId}
+                playersIdsToExclude={fromPlayerId ? [fromPlayerId] : []}
+              />
+            )}
+            <Brick durability={7} className="w-36 flex flex-col gap-same-level">
+              <CoinInput type="copper" />
+              <CoinInput type="silver" />
+              <CoinInput type="gold" />
             </Brick>
-          </Beam>
-        </FormElementNestedWrapper>
+          </Inline>
+          <FormElementNestedWrapper>
+            <Inline className="justify-center items-center">
+              <Brick className={cx(twMerge("w-86", "w-142"))} durability={7}>
+                <FormElementWrapper>
+                  <Input
+                    className="mb-same-level"
+                    name="comment"
+                    label="Comment"
+                    md={12}
+                  />
+                </FormElementWrapper>
+                <Inline className="justify-end">
+                  <FormElementWrapper>
+                    <FormSubmit disabled={changeMoneyMutation.isPending}>
+                      Save
+                    </FormSubmit>
+                  </FormElementWrapper>
+                  <Button onClick={onClose} transparent>
+                    Cancel
+                  </Button>
+                </Inline>
+              </Brick>
+            </Inline>
+          </FormElementNestedWrapper>
+        </Stack>
       </Form>
     </Modal>
   )

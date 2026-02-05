@@ -27,10 +27,10 @@ function CharacterSheet({ characterId }: CharacterSheetProps) {
 
   return (
     <Beam>
-      <Pillar lg={8} md={12} xs={12}>
+      <Pillar lg={8} md={12} sm={12}>
         <CharacterLeftPartView />
       </Pillar>
-      <Pillar lg={4} md={12} xs={12}>
+      <Pillar lg={4} md={12} sm={12}>
         <CampaignView characterId={normalizedId} />
       </Pillar>
     </Beam>

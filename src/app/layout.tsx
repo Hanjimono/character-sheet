@@ -10,6 +10,7 @@ import Frame from "@/ui/Layout/Frame"
 // types and styles
 import "./global.css"
 import Header from "@/components/Layout/Header"
+import Stack from "@/ui/Layout/Stack"
 
 export const metadata = {
   title: "DnD character sheet",
@@ -37,12 +38,12 @@ export default function RootLayout({
       <body className={openSans.className}>
         <TRPCWrapper>
           <Foundation>
-            <Beam className="flex-col" withoutWrap whole withoutGap>
+            <Stack className="overflow-hidden h-full" gap="none">
               <Frame className="main-content">
                 <Header />
                 {children}
               </Frame>
-            </Beam>
+            </Stack>
           </Foundation>
           <Initializer />
         </TRPCWrapper>

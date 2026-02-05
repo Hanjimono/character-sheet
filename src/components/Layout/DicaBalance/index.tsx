@@ -17,6 +17,7 @@ import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { DiceBalanceProps } from "./types"
+import Stack from "@/ui/Layout/Stack"
 
 /**
  * Responsible for displaying and managing the balance of dice rolls
@@ -68,7 +69,7 @@ function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
   }
 
   return (
-    <>
+    <Stack>
       <Room className={calculatedClassNames}>
         <div className="flex w-full min-w-fit h-36 rounded-md shadow-sm shadow-block-600 bg-block-700">
           <Dice
@@ -88,7 +89,7 @@ function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
             />
             <Button
               className="p-0 text-sm h-8"
-              text
+              isText
               secondary
               onClick={() => setIsShowDetails(!isShowDetails)}
               endIcon={isShowDetails ? "arrow_drop_up" : "arrow_drop_down"}
@@ -106,7 +107,7 @@ function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
       <HiddenRoom isShown={isShowDetails}>
         <DiceBalanceStatsTable stats={stats || []} />
       </HiddenRoom>
-    </>
+    </Stack>
   )
 }
 

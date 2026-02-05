@@ -14,6 +14,7 @@ import Title from "@/ui/Presentation/Title"
 import Text from "@/ui/Presentation/Text"
 // Styles and types
 import { CampaignViewProps } from "./types"
+import Stack from "@/ui/Layout/Stack"
 
 /**
  * CampaignView component displays the active campaign for a character.
@@ -45,15 +46,13 @@ function CampaignView({ className, characterId }: CampaignViewProps) {
   }
 
   return (
-    <Beam className={calculatedClassNames}>
+    <Stack className={calculatedClassNames}>
       <Text className="absolute -top-5 left-1 text-gray-400" size="small">
         current campaign:
       </Text>
-      <Title size={1} bottomGap="same">
-        {campaign.name}
-      </Title>
+      <Title size={1}>{campaign.name}</Title>
       <GameView campaignId={campaign.id} characterId={characterId} />
-    </Beam>
+    </Stack>
   )
 }
 

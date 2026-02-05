@@ -11,17 +11,16 @@ import { useStore } from "@/store"
 // Constants
 import { PlayerInfo } from "@/constants/types/players"
 // Components
-import PlayerSelect from "@/components/Helpers/PlayerSelect"
+import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
+import Dice from "@/components/Presentation/Dice"
 // Ui
 import Modal from "@/ui/Navigation/Modal"
 import Room from "@/ui/Layout/Room"
-import Text from "@/ui/Presentation/Text"
-import Beam from "@/ui/Layout/Beam"
+import Inline from "@/ui/Layout/Inline"
+import Stack from "@/ui/Layout/Stack"
 import Button from "@/ui/Actions/Button"
 // Styles and types
 import { DiceRollSaverModalProps } from "./types"
-import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
-import Dice from "@/components/Presentation/Dice"
 
 /**
  * A modal component for saving the result of a critical dice roll.
@@ -74,27 +73,29 @@ function DiceRollSaverModal({
   return (
     <Modal title={title} className={calculatedClassNames}>
       <Room>
-        <Beam>
-          <PlayerFrameSelect
-            characterId={characterId}
-            selectedPlayerId={player?.id}
-            onPlayerSelect={setPlayer}
-          />
-          <div className="flex flex-col items-center justify-center ml-4 pointer-events-none">
-            <Dice isPositive={!isNegative} isWithoutCount />
-          </div>
-        </Beam>
-        <Beam contentJustify="end">
-          <Button
-            onClick={handleSave}
-            disabled={!player || saveRollMutation.isPending}
-          >
-            Save
-          </Button>
-          <Button onClick={onClose} transparent>
-            Cancel
-          </Button>
-        </Beam>
+        <Stack>
+          <Inline>
+            <PlayerFrameSelect
+              characterId={characterId}
+              selectedPlayerId={player?.id}
+              onPlayerSelect={setPlayer}
+            />
+            <div className="flex flex-col items-center justify-center ml-4 pointer-events-none">
+              <Dice isPositive={!isNegative} isWithoutCount />
+            </div>
+          </Inline>
+          <Inline className="justify-end">
+            <Button
+              onClick={handleSave}
+              disabled={!player || saveRollMutation.isPending}
+            >
+              Save
+            </Button>
+            <Button onClick={onClose} transparent>
+              Cancel
+            </Button>
+          </Inline>
+        </Stack>
       </Room>
     </Modal>
   )

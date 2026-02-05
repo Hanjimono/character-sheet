@@ -24,7 +24,11 @@ export default function CharacterPage({ params }: CharacterPageProps) {
   }
 
   return (
-    <WallDecorated animationMode="slide-both-sides" isShortYPadding>
+    <WallDecorated
+      className="h-auto"
+      animationMode="slide-both-sides"
+      isShortYPadding
+    >
       <CharacterSheet characterId={characterId} />
     </WallDecorated>
   )

@@ -8,7 +8,7 @@ import Room from "@/ui/Layout/Room"
 export default function CharacterLeftPartView() {
   return (
     <>
-      <Room bottomGap="other-level">
+      <Room className="mb-other-level">
         <MainInfo />
       </Room>
       <Room>

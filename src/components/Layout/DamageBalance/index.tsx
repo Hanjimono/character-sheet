@@ -19,6 +19,7 @@ import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Button from "@/ui/Actions/Button"
 // Styles and types
 import { DamageBalanceProps } from "./types"
+import Stack from "@/ui/Layout/Stack"
 
 /**
  * Renders the DamageBalance component, which displays the total damage dealt and taken
@@ -70,7 +71,7 @@ function DamageBalance({
     })
   }
   return (
-    <>
+    <Stack>
       <Room className={calculatedClassNames}>
         <div className="relative p-4 flex w-full min-w-fit justify-center items-center h-32 rounded-md shadow-sm shadow-block-600 bg-block-700">
           <DamageStatButton
@@ -79,11 +80,13 @@ function DamageBalance({
             isPositive
           />
           <div className="flex flex-col flex-1 h-full content-center items-center px-4 relative">
-            <Title bottomGap="almost-same">Damage</Title>
-            <Text size="small">Dealt and Taken</Text>
+            <Stack className="items-center" gap="tight">
+              <Title>Damage</Title>
+              <Text size="small">Dealt and Taken</Text>
+            </Stack>
             <Button
               className="p-0 text-sm h-8 absolute bottom-0.25 mr-auto ml-auto"
-              text
+              isText
               secondary
               onClick={() => setIsShowDetails(!isShowDetails)}
               endIcon={isShowDetails ? "arrow_drop_up" : "arrow_drop_down"}
@@ -101,7 +104,7 @@ function DamageBalance({
       <HiddenRoom isShown={isShowDetails}>
         <DamageBalanceStatsTable className="w-full" stats={stats || []} />
       </HiddenRoom>
-    </>
+    </Stack>
   )
 }
 

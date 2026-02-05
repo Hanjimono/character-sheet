@@ -1,14 +1,10 @@
 "use client"
 import ImageButton from "@/ui/Actions/ImageButton"
-import Beam from "@/ui/Layout/Beam"
-import SmartImage from "@/ui/Presentation/SmartImage"
-import Text from "@/ui/Presentation/Text"
-import { motion } from "framer-motion"
-import Link from "next/link"
+import Inline from "@/ui/Layout/Inline"
 
 export default function MenuLine() {
   return (
-    <Beam>
+    <Inline>
       <ImageButton
         src="/public/images/backpack.png"
         className="w-48 h-48"
@@ -42,6 +38,6 @@ export default function MenuLine() {
         description="Красочное описание"
         link="spells"
       />
-    </Beam>
+    </Inline>
   )
 }

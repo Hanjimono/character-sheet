@@ -9,6 +9,8 @@ import Beam from "@/ui/Layout/Beam"
 // Styles and types
 import { ConfirmModalProps } from "./types"
 import Button from "@/ui/Actions/Button"
+import Stack from "@/ui/Layout/Stack"
+import Inline from "@/ui/Layout/Inline"
 
 /**
  * Renders a confirm modal dialog with customizable text, title, and action buttons.
@@ -49,17 +51,19 @@ function ConfirmModal({
   }
   return (
     <Modal title={title} className={calculatedClassNames}>
-      <Room bottomGap>
-        <Text>{text}</Text>
-      </Room>
-      <Beam>
-        <Button onClick={() => handleAction(true)} success>
-          {confirmButtonTitle}
-        </Button>
-        <Button onClick={() => handleAction(false)} cancel>
-          {cancelButtonTitle}
-        </Button>
-      </Beam>
+      <Stack>
+        <Room>
+          <Text>{text}</Text>
+        </Room>
+        <Inline>
+          <Button onClick={() => handleAction(true)}>
+            {confirmButtonTitle}
+          </Button>
+          <Button onClick={() => handleAction(false)} transparent>
+            {cancelButtonTitle}
+          </Button>
+        </Inline>
+      </Stack>
     </Modal>
   )
 }
