@@ -13,6 +13,7 @@ import Beam from "@/ui/Layout/Beam"
 import Title from "@/ui/Presentation/Title"
 import Text from "@/ui/Presentation/Text"
 import Stack from "@/ui/Layout/Stack"
+import Button from "@/ui/Actions/Button"
 // Styles and types
 import { CampaignViewProps } from "./types"
 
@@ -51,6 +52,16 @@ function CampaignView({ className, characterId }: CampaignViewProps) {
         current campaign:
       </Text>
       <Title size={1}>{campaign.name}</Title>
+      <Button
+        link={`/character/${characterId}/games`}
+        className="absolute -top-7.5 right-0"
+        primary
+        isText
+        endIcon="arrow_forward"
+        isNoPadding
+      >
+        View All Games
+      </Button>
       <GameView campaignId={campaign.id} characterId={characterId} />
     </Stack>
   )

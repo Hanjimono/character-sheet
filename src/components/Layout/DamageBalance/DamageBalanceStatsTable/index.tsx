@@ -25,10 +25,8 @@ function DamageBalanceStatsTable({
   return (
     <div className={calculatedClassNames}>
       <div className="flex flex-col gap-2 overflow-visible">
-        <div className="flex justify-between items-center w-full">
-          <Title size={3} bottomGap="almost-same">
-            Damage Balance
-          </Title>
+        <div className="flex justify-between items-center w-full mb-almost-same">
+          <Title size={3}>Damage Balance</Title>
         </div>
         <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-block-600 dark:bg-block-600 dark:text-gray-400">

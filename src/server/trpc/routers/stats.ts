@@ -217,5 +217,65 @@ export const statsRouter = router({
       )
       return balanceTotal
     })
-  })
+  }),
+  getGameStats: publicProcedure
+    .input(z.object({ gameId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      if (!ctx.campaign) {
+        throw new Error("No campaign found")
+      }
+      const { DamageBalanceHistory } = await import(
+        "@/database/models/damageBalanceHistory"
+      )
+      const { DiceBalanceHistory } = await import(
+        "@/database/models/diceBalanceHistory"
+      )
+      const { MoneyBalanceHistory } = await import(
+        "@/database/models/moneyBalanceHistory"
+      )
+
+      const damages = []
+      const rolls = []
+      const moneyTransactions = []
+
+      for (const player of ctx.players) {
+        const damageSum = await DamageBalanceHistory.getDamageSum(
+          ctx.campaign.id,
+          input.gameId,
+          player.id
+        )
+        damages.push({
+          player,
+          totalPositive: damageSum.totalPositive,
+          totalNegative: damageSum.totalNegative
+        })
+
+        const rollsSum = await DiceBalanceHistory.getRollsSum(
+          ctx.campaign.id,
+          input.gameId,
+          player.id
+        )
+        rolls.push({
+          player,
+          totalPositive: rollsSum.totalPositive,
+          totalNegative: rollsSum.totalNegative
+        })
+
+        const moneyHistory = await MoneyBalanceHistory.getHistory(
+          player.id,
+          ctx.campaign.id,
+          input.gameId
+        )
+        moneyTransactions.push({
+          player,
+          history: moneyHistory
+        })
+      }
+
+      return {
+        damages,
+        rolls,
+        moneyTransactions
+      }
+    })
 })

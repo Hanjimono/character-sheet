@@ -44,6 +44,17 @@ export class Game extends Model {
     await game.save()
     return game
   }
+
+  public static async getAllGamesForCampaign(
+    campaignId: number
+  ): Promise<Game[]> {
+    return await Game.findAll({
+      where: {
+        campaignId
+      },
+      order: [["date", "DESC"]]
+    })
+  }
 }
 
 Game.init(

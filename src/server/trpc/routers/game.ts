@@ -17,6 +17,20 @@ export const gameRouter = router({
       characterId: ctx.game.characterId
     } as GameInfo
   }),
+  list: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.campaign) {
+      throw new Error("No campaign found")
+    }
+    const { Game } = await import("@/database/models/game")
+    const games = await Game.getAllGamesForCampaign(ctx.campaign.id)
+    return games.map((game) => ({
+      id: game.id,
+      date: String(game.date),
+      isActive: game.isActive,
+      campaignId: game.campaignId,
+      characterId: game.characterId
+    })) as GameInfo[]
+  }),
   start: publicProcedure.mutation(async ({ ctx }) => {
     if (ctx.game) {
       return ctx.game
