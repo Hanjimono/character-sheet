@@ -1,0 +1,267 @@
+---
+description: tRPC patterns and conventions for server and client
+globs: 
+  - **/server/trpc/**/*.ts
+  - **/lib/trpc/**/*.ts
+  - **/*.tsx
+alwaysApply: false
+---
+
+# tRPC Patterns
+
+## Overview
+
+This project uses tRPC for all API communication. tRPC provides end-to-end type safety between client and server.
+
+## Server-Side (Routers)
+
+### Router Structure
+
+Create routers in `src/server/trpc/routers/`:
+
+```typescript
+// System
+import { z } from "zod"
+// Server
+import { publicProcedure, router } from "../trpc"
+
+export const exampleRouter = router({
+  // Query procedures
+  get: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input, ctx }) => {
+      // Access context: ctx.character, ctx.campaign, ctx.game, ctx.players
+      return data
+    }),
+  
+  // Mutation procedures
+  create: publicProcedure
+    .input(z.object({ name: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      // Perform mutation
+      return result
+    })
+})
+```
+
+### Nested Routers
+
+Use nested routers for related procedures:
+
+```typescript
+export const statsRouter = router({
+  rolls: router({
+    total: publicProcedure.query(async ({ ctx }) => { ... }),
+    game: publicProcedure.query(async ({ ctx }) => { ... }),
+    save: publicProcedure.mutation(async ({ input, ctx }) => { ... })
+  })
+})
+```
+
+### Input Validation
+
+Use Zod schemas for input validation:
+
+```typescript
+const saveSchema = z.object({
+  player: z.number(),
+  isNegative: z.boolean().optional(),
+  count: z.number().min(0)
+})
+
+export const router = router({
+  save: publicProcedure
+    .input(saveSchema)
+    .mutation(async ({ input, ctx }) => {
+      // input is typed based on schema
+    })
+})
+```
+
+### Context Access
+
+Access context properties in procedures:
+
+- `ctx.character` - Current character
+- `ctx.campaign` - Current campaign
+- `ctx.game` - Active game (if exists)
+- `ctx.players` - List of players in campaign
+
+Always check for required context:
+
+```typescript
+if (!ctx.campaign) {
+  throw new Error("No campaign found")
+}
+```
+
+### Error Handling
+
+Throw errors with descriptive messages:
+
+```typescript
+if (!ctx.game) {
+  throw new Error("No active game found")
+}
+```
+
+Errors are automatically caught and returned to the client.
+
+### Database Operations
+
+Use Sequelize models with dynamic imports:
+
+```typescript
+const { Model } = await import("@/database/models/model")
+const result = await Model.someMethod()
+```
+
+Use transactions for multi-step operations:
+
+```typescript
+const sequelize = (await import("@/lib/sequlize")).default
+await sequelize.transaction(async (transaction) => {
+  // Multiple database operations
+})
+```
+
+### Registering Routers
+
+Add routers to `src/server/trpc/routers/_app.ts`:
+
+```typescript
+export const appRouter = router({
+  campaign: campaignRouter,
+  game: gameRouter,
+  // ... other routers
+})
+```
+
+## Client-Side (React Components)
+
+### Setup
+
+Components using tRPC must:
+1. Be wrapped in `TRPCProvider` (usually in layout)
+2. Use `useSetCharacterId` hook when receiving `characterId` as prop
+
+### Character ID Context
+
+Always set character ID before using tRPC queries:
+
+```typescript
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+
+function Component({ characterId }: Props) {
+  useSetCharacterId(characterId)
+  // Now tRPC queries will use this characterId
+}
+```
+
+### Queries
+
+Use `trpc.*.useQuery()` for data fetching:
+
+```typescript
+import { trpc } from "@/lib/trpc/client"
+
+const { data, isLoading, error } = trpc.money.balance.useQuery(
+  undefined, // input (if any)
+  { enabled: !!characterId } // options
+)
+```
+
+### Mutations
+
+Use `trpc.*.useMutation()` for data modifications:
+
+```typescript
+import { trpc } from "@/lib/trpc/client"
+import { useStore } from "@/store"
+
+const errorSnack = useStore((state) => state.errorSnack)
+const successSnack = useStore((state) => state.successSnack)
+
+const mutation = trpc.stats.rolls.save.useMutation({
+  onSuccess: () => {
+    successSnack("Roll saved successfully")
+    onConfirm?.()
+  },
+  onError: (error) => {
+    errorSnack(error.message || "Failed to save roll")
+  }
+})
+
+// Use mutation
+mutation.mutate({ player: 1, isNegative: false })
+```
+
+### Query Invalidation
+
+Use `trpc.useUtils()` to invalidate queries after mutations:
+
+```typescript
+const utils = trpc.useUtils()
+
+const handleSave = () => {
+  mutation.mutate(data, {
+    onSuccess: () => {
+      utils.money.balance.invalidate()
+      utils.money.stats.invalidate()
+    }
+  })
+}
+```
+
+### Conditional Queries
+
+Use `enabled` option to conditionally run queries:
+
+```typescript
+const { data: totalBalance } = trpc.stats.rolls.total.useQuery(undefined, {
+  enabled: !!characterId && !isShowGameStats
+})
+
+const { data: gameBalance } = trpc.stats.rolls.game.useQuery(undefined, {
+  enabled: !!characterId && !!isShowGameStats && !!gameId
+})
+```
+
+### Loading States
+
+Access loading states:
+
+```typescript
+const { data, isLoading } = trpc.example.get.useQuery()
+const mutation = trpc.example.save.useMutation()
+// mutation.isPending for mutation loading state
+```
+
+## Import Organization
+
+Follow project import order (see `.cursor/rules/project-standards.mdc`):
+
+```typescript
+"use client"
+// System
+import { useState } from "react"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Store
+import { useStore } from "@/store"
+// Components
+import SomeComponent from "@/components/SomeComponent"
+// Ui
+import Button from "@/ui/Actions/Button"
+// Constants
+import { SOME_CONSTANT } from "@/constants/some"
+// Styles and types
+import { ComponentProps } from "./types"
+```
+
+## Type Safety
+
+- All tRPC procedures are fully typed
+- Use `AppRouter` type from `@/server/trpc/routers/_app` for type inference
+- Client automatically infers types from server routers

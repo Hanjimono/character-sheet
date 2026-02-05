@@ -1,0 +1,87 @@
+---
+description: TypeScript type patterns and conventions
+globs: **/*.ts
+alwaysApply: false
+---
+
+# TypeScript Type Patterns
+
+## Type Definitions
+
+### Component Props
+
+Define component props in separate `types.ts` file:
+
+```typescript
+export interface ComponentProps extends React.HTMLProps<HTMLDivElement> {
+  /** React children */
+  children?: React.ReactNode
+  /** Classes */
+  className?: string
+  /** Description of prop */
+  propName?: string
+}
+```
+
+### Generic Types
+
+Use generics for reusable types:
+
+```typescript
+export interface FormProps<FormValues extends FieldValues> {
+  defaultValues?: DefaultValues<FormValues>
+  methods?: UseFormReturn<FormValues, any, undefined>
+}
+```
+
+## Type Organization
+
+- Place types in `types.ts` files co-located with components
+- Use `@/constants/types/*` for shared types
+- Group related types in the same file
+
+## Interface vs Type
+
+- Prefer `interface` for object shapes
+- Use `type` for unions, intersections, or computed types
+
+## API Types
+
+Define API-related types in `@/constants/types/api.ts`:
+
+```typescript
+export interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+  details?: string
+}
+```
+
+## Database Model Types
+
+- Sequelize models extend `Model` class
+- Use `Optional<>` from Sequelize for creation attributes
+- Define public properties with proper types
+
+## Type Exports
+
+- Export types/interfaces individually
+- Use named exports for types
+- Group related exports together
+
+## JSDoc for Types
+
+Document complex types:
+
+```typescript
+/**
+ * Represents the state of the modal system.
+ */
+export interface ModalState {
+  /**
+   * List of all opened modals.
+   */
+  listOfOpenModals: Partial<OpenedModal>
+}
+```

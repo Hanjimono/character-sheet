@@ -1,11 +1,11 @@
 "use client"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Components
 import ImportantNote from "@/components/Layout/Notes/ImportantNote"
-// Services
-import { useFetchAndStoreData } from "@/service/fetcher"
 // Types
 import { ImportantNotesProps } from "./types"
-import { ObsidianCallout } from "@/constants/types/notes"
 
 /**
  * Renders a list of important notes for a given character.
@@ -13,11 +13,10 @@ import { ObsidianCallout } from "@/constants/types/notes"
  * @param characterId - The unique identifier of the character whose notes are to be displayed.
  */
 export default function ImportantNotes({ characterId }: ImportantNotesProps) {
-  const [notes] = useFetchAndStoreData<ObsidianCallout[]>(
-    "/api/notes/important",
-    undefined,
-    characterId
-  )
+  useSetCharacterId(characterId)
+  const { data: notes } = trpc.notes.important.useQuery(undefined, {
+    enabled: !!characterId
+  })
   if (!notes || notes.length === 0) {
     return null
   }

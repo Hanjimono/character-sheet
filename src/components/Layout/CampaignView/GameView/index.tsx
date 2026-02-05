@@ -5,19 +5,15 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import DiceBalance from "@/components/Layout/DicaBalance"
 import MoneyBalance from "@/components/Layout/MoneyBalance"
 import DamageBalance from "@/components/Layout/DamageBalance"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Ui
 import Room from "@/ui/Layout/Room"
 import Button from "@/ui/Actions/Button"
-// Services
-import { useFetchAndStoreData, usePostData } from "@/service/fetcher"
 // Styles and types
 import { GameViewProps } from "./types"
 import { GameInfo } from "@/constants/types/game"
-
-// apies
-const GET_ACTIVE_GAME_API = "/api/game/active"
-const START_NEW_GAME_API = "/api/game/start"
-const END_GAME_API = "/api/game/end"
 
 /**
  * The `GameView` component is responsible for managing and displaying the state of a game
@@ -28,24 +24,31 @@ const END_GAME_API = "/api/game/end"
  * @param {string} props.characterId - The ID of the character participating in the game.
  */
 function GameView({ campaignId, characterId }: GameViewProps) {
-  const [game, loading, fetchGame] = useFetchAndStoreData<GameInfo>(
-    GET_ACTIVE_GAME_API,
-    undefined,
-    characterId
-  )
-  const [startGame] = usePostData(START_NEW_GAME_API, undefined, characterId)
-  const [endGame] = usePostData(END_GAME_API, undefined, characterId)
-  const handleStartNewGame = async () => {
-    const response = await startGame()
-    if (response) {
-      await fetchGame()
+  useSetCharacterId(characterId)
+  const utils = trpc.useUtils()
+  const {
+    data: game,
+    isLoading: loading,
+    refetch: fetchGame
+  } = trpc.game.active.useQuery(undefined, {
+    enabled: !!characterId
+  })
+  const startGameMutation = trpc.game.start.useMutation({
+    onSuccess: () => {
+      utils.game.active.invalidate()
     }
+  })
+  const endGameMutation = trpc.game.end.useMutation({
+    onSuccess: () => {
+      utils.game.active.invalidate()
+    }
+  })
+
+  const handleStartNewGame = async () => {
+    await startGameMutation.mutateAsync()
   }
   const handleEndGame = async () => {
-    const response = await endGame()
-    if (response) {
-      await fetchGame()
-    }
+    await endGameMutation.mutateAsync()
   }
   return (
     <>

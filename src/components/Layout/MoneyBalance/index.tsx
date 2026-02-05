@@ -1,9 +1,11 @@
+"use client"
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-import { useEffect, useState } from "react"
-// Service
-import { useFetchAndStoreData } from "@/service/fetcher"
+import { useState } from "react"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // store
 import { useStore } from "@/store"
 // Components
@@ -32,29 +34,26 @@ import {
  * @param {string} props.gameId - The ID of the game, used for showing detailed stats.
  */
 function MoneyBalance({ className, characterId, gameId }: MoneyBalanceProps) {
+  useSetCharacterId(characterId)
   const calculatedClassNames = cx(
     twMerge(
       "money-balance bg-block-700 min-w-full min-h-8 p-2 rounded-md",
       className
     )
   )
-  const [moneyBalance, loading, fetchBalance] =
-    useFetchAndStoreData<MoneyBalanceInfo>(
-      "/api/money/balance",
-      null,
-      characterId
-    )
-  const [stats, statsLoading, fetchStats] = useFetchAndStoreData<
-    MoneyBalancePlayerInfo[]
-  >("/api/money/stats", null, characterId)
+  const utils = trpc.useUtils()
+  const { data: moneyBalance, isLoading: loading } =
+    trpc.money.balance.useQuery(undefined, { enabled: !!characterId })
+  const { data: stats, isLoading: statsLoading } = trpc.money.stats.useQuery(
+    undefined,
+    { enabled: !!characterId }
+  )
   const [isShowDetails, setIsShowDetails] = useState(false)
   const openModal = useStore((state) => state.openModal)
-  useEffect(() => {
-    fetchBalance()
-  }, [fetchBalance])
+
   const handleDataFetch = () => {
-    fetchBalance()
-    fetchStats()
+    utils.money.balance.invalidate()
+    utils.money.stats.invalidate()
   }
   const handleChangeMoney = (
     isNegative: boolean = false,

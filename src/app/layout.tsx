@@ -1,5 +1,6 @@
 // components
 import Initializer from "@/components/Helpers/Initializer"
+import TRPCWrapper from "@/components/Helpers/TRPCWrapper"
 // constants
 import { openSans } from "@/constants/fonts"
 // ui
@@ -34,15 +35,17 @@ export default function RootLayout({
         />
       </head>
       <body className={openSans.className}>
-        <Foundation>
-          <Beam className="flex-col" withoutWrap whole withoutGap>
-            <Frame className="main-content">
-              <Header />
-              {children}
-            </Frame>
-          </Beam>
-        </Foundation>
-        <Initializer />
+        <TRPCWrapper>
+          <Foundation>
+            <Beam className="flex-col" withoutWrap whole withoutGap>
+              <Frame className="main-content">
+                <Header />
+                {children}
+              </Frame>
+            </Beam>
+          </Foundation>
+          <Initializer />
+        </TRPCWrapper>
       </body>
     </html>
   )

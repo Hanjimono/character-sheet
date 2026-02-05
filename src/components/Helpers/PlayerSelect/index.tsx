@@ -1,7 +1,11 @@
+"use client"
 // System
-import { useEffect, useState } from "react"
+import { useMemo } from "react"
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Ui
 import Select from "@/ui/Form/Select"
 // Constants
@@ -31,29 +35,20 @@ function PlayerSelect({
   onPlayerSelect,
   selectedPlayerId
 }: PlayerSelectProps) {
+  useSetCharacterId(characterId)
   const calculatedClassNames = cx(twMerge("player-select", className))
-  const [playerList, setPlayerList] = useState<PlayerSelectOption[]>([])
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!characterId) return
-      const response = await fetch(
-        `/api/dictionary/players?character=${characterId}`
-      )
-      const data = await response.json()
-      if (data && data.players) {
-        const options: PlayerSelectOption[] = []
-        data.players.map((player: PlayerInfo) => {
-          options.push({
-            value: player.id,
-            title: player.name,
-            playerInfo: player
-          })
-        })
-        setPlayerList(options)
-      }
-    }
-    fetchData()
-  }, [characterId])
+  const { data: players } = trpc.dictionary.players.useQuery(undefined, {
+    enabled: !!characterId
+  })
+
+  const playerList = useMemo<PlayerSelectOption[]>(() => {
+    if (!players) return []
+    return players.map((player: PlayerInfo) => ({
+      value: player.id,
+      title: player.name,
+      playerInfo: player
+    }))
+  }, [players])
   const handlePlayerSelect = (name: string, value?: number) => {
     if (!value) {
       if (!!onPlayerSelect) {

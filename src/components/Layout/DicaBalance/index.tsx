@@ -2,7 +2,10 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useState } from "react"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // store
 import { useStore } from "@/store"
 // Components
@@ -14,42 +17,35 @@ import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Switch from "@/ui/Form/Switch"
 // Styles and types
 import { DiceBalanceProps } from "./types"
-import { DiceBalanceInfo, DiceBalancePlayerInfo } from "@/constants/types/dice"
-import { useFetchAndStoreData } from "@/service/fetcher"
-
-const GET_DICE_BALANCE_API = "/api/stats/rolls/total"
-const GET_DICE_BALANCE_GAME_API = "/api/stats/rolls/game"
 
 /**
  * Responsible for displaying and managing the balance of dice rolls
  * (positive and negative) for all players in a campaign or game. It provides functionality to view
  * critical roll statistics, toggle between total and current game stats, and open a modal to save dice rolls.
  *
- * @param {string} props.className - Additional CSS class names to style the component.
- * @param {string} props.campaignId - The ID of the campaign associated with the dice balance.
- * @param {string} props.characterId - The ID of the character associated with the dice balance.
- * @param {string} props.gameId - The ID of the game associated with the dice balance.
+ * @param {string} className - Additional CSS class names to style the component.
+ * @param {number} characterId - The ID of the character associated with the dice balance.
+ * @param {number} gameId - The ID of the game associated with the dice balance.
  */
 function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
+  useSetCharacterId(characterId)
   const [isShowGameStats, setIsShowGameStats] = useState(false)
-  const [balance, loading, fetchBalance] =
-    useFetchAndStoreData<DiceBalanceInfo>(
-      isShowGameStats ? GET_DICE_BALANCE_GAME_API : GET_DICE_BALANCE_API,
-      undefined,
-      characterId
+  const utils = trpc.useUtils()
+  const { data: totalBalance, isLoading: totalLoading } =
+    trpc.stats.rolls.total.useQuery(undefined, {
+      enabled: !!characterId && !isShowGameStats
+    })
+  const { data: gameBalance, isLoading: gameLoading } =
+    trpc.stats.rolls.game.useQuery(undefined, {
+      enabled: !!characterId && !!isShowGameStats && !!gameId
+    })
+  const { data: stats, isLoading: statsLoading } =
+    trpc.stats.rolls.table.useQuery(
+      { isShowGameStats },
+      { enabled: !!characterId }
     )
-  const params = useMemo(() => {
-    return {
-      isShowGameStats: isShowGameStats
-    }
-  }, [isShowGameStats])
-  const [stats, statsLoading, fetchStats] = useFetchAndStoreData<
-    DiceBalancePlayerInfo[]
-  >("/api/stats/rolls/table", params, characterId)
-  const fetchAllData = useCallback(() => {
-    fetchBalance()
-    fetchStats()
-  }, [fetchBalance, fetchStats])
+  const balance = isShowGameStats ? gameBalance : totalBalance
+  const loading = isShowGameStats ? gameLoading : totalLoading
   const calculatedClassNames = cx(
     twMerge(
       "dice-balance min-w-full flex justify-center items-center",
@@ -58,11 +54,16 @@ function DiceBalance({ className, characterId, gameId }: DiceBalanceProps) {
   )
   const [isShowDetails, setIsShowDetails] = useState(false)
   const openModal = useStore((state) => state.openModal)
+  const handleDataFetch = () => {
+    utils.stats.rolls.total.invalidate()
+    utils.stats.rolls.game.invalidate()
+    utils.stats.rolls.table.invalidate()
+  }
   const handleSaveDiceRoll = (isPositive: boolean) => {
     openModal("diceRollSaver", {
       isNegative: !isPositive,
       characterId: characterId,
-      onConfirm: fetchAllData
+      onConfirm: handleDataFetch
     })
   }
 

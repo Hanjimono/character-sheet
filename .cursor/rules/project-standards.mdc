@@ -1,0 +1,65 @@
+---
+description: Core project standards and conventions
+alwaysApply: true
+---
+
+# Project Standards
+
+## Code Formatting
+
+- Use 2 spaces for indentation (no tabs)
+- No semicolons at end of statements
+- No trailing commas
+- Use Prettier for formatting (configured in `.prettierrc`)
+
+## Import Organization
+
+Organize imports in this exact order with comments:
+
+```typescript
+// System
+import { useState } from "react"
+import clsx from "clsx"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Store
+import { useStore } from "@/store"
+// Components
+import SomeComponent from "@/components/SomeComponent"
+// Ui
+import Button from "@/ui/Actions/Button"
+import Beam from "@/ui/Layout/Beam"
+// Constants
+import { MODAL_LIST } from "@/constants/modalList"
+// Styles and types
+import { ComponentProps } from "./types"
+import styles from "./styles.module.scss"
+```
+
+**Note**: Include "Lib" section when using tRPC or other library utilities. Include "Components" section when importing other components.
+
+## Path Aliases
+
+- Use `@/*` alias for imports from `src/*`
+- Example: `import Button from "@/ui/Actions/Button"`
+
+## File Naming
+
+- Components: PascalCase (e.g., `Header.tsx`, `ModalContainer.tsx`)
+- API routes: `route.ts` (Next.js App Router convention)
+- Types: `types.ts` (co-located with component)
+- Database models: PascalCase (e.g., `Character.ts`, `Player.ts`)
+
+## Component Structure
+
+- Components should have `index.tsx` and `types.ts` files
+- Use default exports for components
+- Place types in separate `types.ts` file, not inline
+
+## TypeScript
+
+- Use strict mode (enabled in `tsconfig.json`)
+- Prefer interfaces over types for object shapes
+- Use generic types where appropriate (e.g., `FormProps<FormValues>`)
+- Always type function parameters and return types

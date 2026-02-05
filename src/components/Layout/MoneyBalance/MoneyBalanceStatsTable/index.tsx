@@ -1,13 +1,10 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// Service
-import { useFetchAndStoreData } from "@/service/fetcher"
 // Components
 import MoneyRender from "@/components/Helpers/MoneyRender"
 // Styles and types
 import { MoneyBalanceStatsTableProps } from "./types"
-import { MoneyBalancePlayerInfo } from "@/constants/types/money"
 
 /**
  * Renders a table displaying the money balance statistics for players associated with a character.

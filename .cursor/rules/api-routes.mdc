@@ -1,0 +1,106 @@
+---
+description: API route patterns and conventions (Legacy - prefer tRPC)
+globs: **/app/api/**/*.ts
+alwaysApply: false
+---
+
+# API Route Patterns
+
+> **Note**: This project primarily uses tRPC for API communication. See `.cursor/rules/trpc.mdc` for tRPC patterns. REST API routes should only be used for special cases (e.g., webhooks, external integrations).
+
+## Route Structure
+
+API routes follow Next.js App Router conventions:
+
+- File: `route.ts`
+- Export named functions: `GET`, `POST`, `PUT`, `DELETE`, etc.
+
+## Handler Wrappers
+
+### Context Wrappers
+
+Use context wrappers to provide common data:
+
+```typescript
+import { withCampaignContext } from "@/lib/api/context/campaing"
+import { withGameContext } from "@/lib/api/context/game"
+
+export const GET = withCampaignContext<ReturnType>(
+  async ({ req, character, campaign }) => {
+    // Handler logic
+  }
+)
+```
+
+Available context wrappers:
+
+- `withCampaignContext<T>` - Provides campaign and character context
+- `withGameContext<T>` - Provides game, campaign, character, and players context
+
+### Post Validation
+
+Use `withPostValidateContext` for POST requests with validation:
+
+```typescript
+import { withPostValidateContext } from "@/lib/api/context/postValidate"
+import * as yup from "yup"
+
+const validationSchema = yup.object().shape({
+  field: yup.string().required()
+})
+
+export const POST = withGameContext(async (ctx) =>
+  withPostValidateContext<RequestData, ApiGameContext, ResponseData>(
+    ctx,
+    validationSchema,
+    async ({ game, campaign }, validatedData) => {
+      // Handler logic with validated data
+    }
+  )
+)
+```
+
+## Response Helpers
+
+Always use standardized response helpers:
+
+```typescript
+import { success, error } from "@/lib/api/response"
+
+// Success response
+return success(data)
+
+// Error response
+return error("Error message", errorDetails, statusCode)
+```
+
+## Error Handling
+
+- Context wrappers automatically handle errors via `apiHandler`
+- Throw errors with descriptive messages
+- Errors are caught and returned as standardized error responses
+
+## Validation
+
+- Use Yup schemas for request validation
+- Define schemas above the route handler
+- Use `withPostValidateContext` for POST/PUT requests
+
+## Database Operations
+
+- Use Sequelize models from `@/database/models/*`
+- Use transactions for multi-step operations:
+
+  ```typescript
+  import sequelize from "@/lib/sequlize"
+
+  await sequelize.transaction(async (transaction) => {
+    // Multiple database operations
+  })
+  ```
+
+## Type Safety
+
+- Type the return type of context wrappers: `withCampaignContext<ReturnType>`
+- Use types from `@/constants/types/api` for context types
+- Define request/response types in `@/constants/types/*`

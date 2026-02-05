@@ -1,9 +1,13 @@
+"use client"
 // System
 import { useCallback, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { cx } from "class-variance-authority"
-// Service
-import { usePostData } from "@/service/fetcher"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Store
+import { useStore } from "@/store"
 // Constants
 import { PlayerInfo } from "@/constants/types/players"
 // Components
@@ -39,30 +43,34 @@ function DiceRollSaverModal({
   title = "Save result of Critical Roll",
   onClose
 }: DiceRollSaverModalProps) {
+  useSetCharacterId(characterId)
+  const errorSnack = useStore((state) => state.errorSnack)
+  const successSnack = useStore((state) => state.successSnack)
   const calculatedClassNames = twMerge(
     cx("dice-saver box-border min-w-80 bg-block-700", className)
   )
   const [player, setPlayer] = useState<PlayerInfo | undefined>()
-  const [saveCriticalRoll] = usePostData(
-    "/api/stats/rolls/save",
-    {},
-    characterId,
-    {
-      player: player?.id,
-      isNegative
+  const saveRollMutation = trpc.stats.rolls.save.useMutation({
+    onSuccess: () => {
+      successSnack(
+        `Roll saved for ${player?.name} (it's ${isNegative ? "natural 1" : "natural 20"})`
+      )
+      onConfirm?.()
+      onClose()
     },
-    `Roll saved for ${player?.name} (it's ${isNegative ? "natural 1" : "natural 20"})`
-  )
+    onError: (error) => {
+      errorSnack(error.message || "Failed to save roll")
+    }
+  })
   const handleSave = useCallback(async () => {
     if (!player) {
       return
     }
-    const result = await saveCriticalRoll()
-    if (result) {
-      onConfirm?.()
-      onClose()
-    }
-  }, [player, saveCriticalRoll, onConfirm, onClose])
+    saveRollMutation.mutate({
+      player: player.id,
+      isNegative
+    })
+  }, [player, saveRollMutation, isNegative])
   return (
     <Modal title={title} className={calculatedClassNames}>
       <Room>
@@ -77,7 +85,10 @@ function DiceRollSaverModal({
           </div>
         </Beam>
         <Beam contentJustify="end">
-          <Button onClick={handleSave} disabled={!player}>
+          <Button
+            onClick={handleSave}
+            disabled={!player || saveRollMutation.isPending}
+          >
             Save
           </Button>
           <Button onClick={onClose} transparent>

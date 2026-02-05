@@ -1,13 +1,16 @@
+"use client"
 // System
 import { useCallback, useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { cx } from "class-variance-authority"
 import * as yup from "yup"
-// Constants
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Store
+import { useStore } from "@/store"
 // Components
 import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
-// Services
-import { postFormData, usePostFormDataHelpers } from "@/service/fetcher"
 // Ui
 import Modal from "@/ui/Navigation/Modal"
 import Beam from "@/ui/Layout/Beam"
@@ -51,38 +54,35 @@ function DamageSaverModal({
   title = "Save Damage stats",
   onClose
 }: DamageSaverModalProps) {
-  const [errorSnack, successSnack] = usePostFormDataHelpers()
+  useSetCharacterId(characterId)
+  const errorSnack = useStore((state) => state.errorSnack)
+  const successSnack = useStore((state) => state.successSnack)
   const calculatedClassNames = twMerge(
     cx("damage-saver box-border w-117 bg-transparent", className)
   )
   const [player, setPlayer] = useState<PlayerInfo | undefined>()
+  const saveDamageMutation = trpc.stats.damage.save.useMutation({
+    onSuccess: () => {
+      successSnack(`Damage saved for ${player?.name}`)
+      onConfirm?.()
+      onClose()
+    },
+    onError: (error) => {
+      errorSnack(error.message || "Failed to save damage")
+    }
+  })
   const handleSave = async (data: any) => {
     if (!player) {
       return
     }
     const { count, comment, isSummon } = data
-    const damageSaveResult = await postFormData(
-      "/api/stats/damage/save",
-      undefined,
-      {
-        player: player.id,
-        isNegative: isNegative,
-        count: Number(count) || 0,
-        comment: comment || null,
-        isSummon: isSummon || false
-      },
-      characterId,
-      successSnack,
-      errorSnack,
-      undefined,
-      `Damage saved for ${player.name}`
-    )
-    if (damageSaveResult) {
-      if (!!onConfirm) {
-        onConfirm()
-      }
-      onClose()
-    }
+    saveDamageMutation.mutate({
+      player: player.id,
+      isNegative: isNegative,
+      count: Number(count) || 0,
+      comment: comment || null,
+      isSummon: isSummon || false
+    })
   }
   return (
     <Modal className={calculatedClassNames}>
@@ -123,7 +123,9 @@ function DamageSaverModal({
             </FormElementWrapper>
             <Beam contentJustify="end">
               <FormElementWrapper>
-                <FormSubmit disabled={!player}>Save</FormSubmit>
+                <FormSubmit disabled={!player || saveDamageMutation.isPending}>
+                  Save
+                </FormSubmit>
                 <Button onClick={onClose} transparent>
                   Cancel
                 </Button>

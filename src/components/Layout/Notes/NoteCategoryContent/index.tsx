@@ -1,11 +1,10 @@
+"use client"
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-import { useMemo } from "react"
-// Service
-import { useFetchAndStoreData } from "@/service/fetcher"
-// Constants
-import { NotesListForCategory } from "@/constants/types/notes"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Styles and types
 import { NotesCategoryContentProps } from "./types"
 import ObsidianNote from "../ObsidianNote"
@@ -25,19 +24,16 @@ function NotesCategoryContent({
   folder,
   characterId
 }: NotesCategoryContentProps) {
+  useSetCharacterId(characterId)
   const calculatedClassNames = cx(
     twMerge(
       "notes-category-content flex flex-col gap-other-level py-4",
       className
     )
   )
-  const params = useMemo(() => {
-    return { folder }
-  }, [folder])
-  const [notesList] = useFetchAndStoreData<NotesListForCategory>(
-    "/api/notes/list",
-    params,
-    characterId
+  const { data: notesList } = trpc.notes.list.useQuery(
+    { folder },
+    { enabled: !!characterId }
   )
   return (
     <div className={calculatedClassNames}>

@@ -1,10 +1,14 @@
+"use client"
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
 import * as yup from "yup"
 import { useState } from "react"
-// Services
-import { postFormData, usePostFormDataHelpers } from "@/service/fetcher"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Store
+import { useStore } from "@/store"
 // Components
 import PlayerFrameSelect from "@/components/Helpers/PlayerFrameSelect"
 // Ui
@@ -61,6 +65,9 @@ function MoneyChangeSaverModal({
   isCommon,
   onConfirm
 }: MoneyChangeSaverModalProps) {
+  useSetCharacterId(characterId)
+  const errorSnack = useStore((state) => state.errorSnack)
+  const successSnack = useStore((state) => state.successSnack)
   const calculatedClassNames = cx(
     twMerge(
       "money-change-saver-modal bg-transparent max-w-100",
@@ -68,7 +75,6 @@ function MoneyChangeSaverModal({
       className
     )
   )
-  const [errorSnack, successSnack] = usePostFormDataHelpers()
   const title = isTransfer
     ? "Transfer money to player"
     : isNegative
@@ -76,6 +82,16 @@ function MoneyChangeSaverModal({
       : "Add money"
   const [fromPlayer, setFromPlayer] = useState<PlayerInfo | undefined>()
   const [toPlayer, setToPlayer] = useState<PlayerInfo | undefined>()
+  const changeMoneyMutation = trpc.money.change.useMutation({
+    onSuccess: () => {
+      successSnack("Money change saved")
+      onConfirm?.()
+      onClose()
+    },
+    onError: (error) => {
+      errorSnack(error.message || "Failed to save money change")
+    }
+  })
   const handleConfirm = async (data: any) => {
     const { gold, silver, copper, comment } = data
     const money = transformCoinsToCopper({
@@ -85,29 +101,15 @@ function MoneyChangeSaverModal({
       silver: Number(silver) || 0,
       copper: Number(copper) || 0
     })
-    const saveResult = await postFormData(
-      `/api/money/change`,
-      undefined,
-      {
-        money: isNegative ? -money : money,
-        fromPlayerId: fromPlayer?.id,
-        toPlayerId: toPlayer?.id,
-        count: money,
-        isTransfer,
-        isCommon,
-        isNegative,
-        comment
-      },
-      characterId,
-      successSnack,
-      errorSnack,
-      undefined,
-      "Money change saved"
-    )
-    if (saveResult) {
-      onConfirm?.()
-      onClose()
-    }
+    changeMoneyMutation.mutate({
+      fromPlayerId: fromPlayer?.id,
+      toPlayerId: toPlayer?.id,
+      count: money,
+      isTransfer,
+      isCommon,
+      isNegative,
+      comment
+    })
   }
   const fromPlayerId = fromPlayer?.id
   const toPlayerId = toPlayer?.id
@@ -164,7 +166,9 @@ function MoneyChangeSaverModal({
               </FormElementWrapper>
               <Beam contentJustify="end">
                 <FormElementWrapper>
-                  <FormSubmit>Save</FormSubmit>
+                  <FormSubmit disabled={changeMoneyMutation.isPending}>
+                    Save
+                  </FormSubmit>
                 </FormElementWrapper>
                 <Button onClick={onClose} transparent>
                   Cancel

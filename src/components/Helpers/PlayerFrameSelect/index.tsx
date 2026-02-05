@@ -1,9 +1,11 @@
+"use client"
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
 import { useRef, useState } from "react"
-// Service
-import { useFetchAndStoreData } from "@/service/fetcher"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Ui
 import ImageButton from "@/ui/Actions/ImageButton"
 import PortalPopupAppearTransition from "@/ui/Skeleton/Transition/PortalPopupAppearTransition"
@@ -37,11 +39,10 @@ function PlayerFrameSelect({
     DOMRect | undefined
   >(undefined)
   const selectPlayerRef = useRef<HTMLDivElement>(null)
-  const [players] = useFetchAndStoreData<PlayerInfo[]>(
-    "/api/dictionary/players",
-    null,
-    characterId
-  )
+  useSetCharacterId(characterId)
+  const { data: players } = trpc.dictionary.players.useQuery(undefined, {
+    enabled: !!characterId
+  })
   const selectedPlayer = players?.find(
     (player) => player.id === selectedPlayerId
   )

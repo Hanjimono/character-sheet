@@ -1,0 +1,122 @@
+---
+description: React component patterns and conventions
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# React Component Patterns
+
+## Component Structure
+
+### Client Components
+
+Add `"use client"` directive at the top for components that use hooks, state, or browser APIs:
+
+```typescript
+"use client"
+// System
+import { useState } from "react"
+```
+
+### Component Function Pattern
+
+```typescript
+function ComponentName({ prop1, prop2, ...rest }: ComponentProps) {
+  // Component logic
+  return <div>...</div>
+}
+export default ComponentName
+```
+
+## JSDoc Comments
+
+Follow the project's JSDoc pattern for component documentation:
+
+```typescript
+/**
+ * Component description
+ *
+ * @param {React.ReactNode} children - Description of children prop
+ * @param {string} [className] - Optional description
+ * @param {boolean} [isActive] - Optional description
+ */
+```
+
+**Important**: Do NOT document the `@param {Object} props` line. Document individual props directly without the "props." prefix.
+
+## Props Destructuring
+
+- Destructure props in function signature
+- Use `...rest` for passing remaining props to DOM elements
+- Extract calculated values (like `calculatedClassNames`) before return
+
+## Styling
+
+- Use `twMerge` and `cx` (class-variance-authority) for className merging
+- Pattern: `const calculatedClassNames = twMerge(cx("base-classes", className))`
+- Use Tailwind CSS classes
+- SCSS modules are available but prefer Tailwind
+
+## Component Organization
+
+- Keep components focused and single-purpose
+- Extract complex logic into custom hooks
+- Use composition over configuration
+- Prefer function components over class components
+
+## State Management
+
+- Use Zustand for global state (`useStore` from `@/store`)
+- Use React hooks (`useState`, `useCallback`, `useMemo`) for local state
+- Use `immer` for immutable state updates in Zustand stores
+
+## Form Handling
+
+- Use `react-hook-form` with `yup` validation
+- Wrap forms with `Form` component from `@/ui/Form/Form`
+- Use form elements from `@/ui/Form/*`
+
+## Data Fetching
+
+### tRPC (Primary Method)
+
+Use tRPC for all API communication. See `.cursor/rules/trpc.mdc` for detailed patterns.
+
+**Basic Query Pattern:**
+
+```typescript
+"use client"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+
+function Component({ characterId }: Props) {
+  useSetCharacterId(characterId)
+  const { data, isLoading } = trpc.example.get.useQuery(undefined, {
+    enabled: !!characterId
+  })
+  // ...
+}
+```
+
+**Mutation Pattern:**
+
+```typescript
+const mutation = trpc.example.save.useMutation({
+  onSuccess: () => {
+    successSnack("Saved successfully")
+    onConfirm?.()
+  },
+  onError: (error) => {
+    errorSnack(error.message)
+  }
+})
+
+// Use: mutation.mutate({ data })
+```
+
+**Key Points:**
+- Always use `useSetCharacterId(characterId)` when component receives `characterId` prop
+- Use `enabled` option for conditional queries
+- Handle errors and success in mutation callbacks
+- Use `trpc.useUtils()` for query invalidation after mutations

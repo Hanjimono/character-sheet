@@ -1,0 +1,84 @@
+---
+description: Database and Sequelize model patterns
+globs: **/database/**/*.ts
+alwaysApply: false
+---
+
+# Database and Sequelize Patterns
+
+## Model Structure
+
+### Model Class Definition
+
+```typescript
+import { Model, DataTypes } from "sequelize"
+import sequelize from "@/lib/sequlize"
+
+export class ModelName extends Model {
+  public id!: number
+  public fieldName!: string
+
+  // timestamps
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
+}
+
+ModelName.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true
+    },
+    fieldName: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
+  },
+  {
+    tableName: "table_name",
+    sequelize
+  }
+)
+```
+
+## Model Methods
+
+- Add static methods to models for common queries
+- Use async/await for database operations
+- Return typed results
+
+## Transactions
+
+Use transactions for multi-step operations:
+
+```typescript
+import sequelize from "@/lib/sequlize"
+
+await sequelize.transaction(async (transaction) => {
+  await Model1.create(data1, { transaction })
+  await Model2.create(data2, { transaction })
+})
+```
+
+## Migrations
+
+- Migrations are in `src/database/migrations/`
+- Use Sequelize CLI: `yarn sequelize migration:generate --name migration-name`
+- Follow naming convention: `YYYYMMDDHHMMSS-description.js`
+
+## Seeders
+
+- Seeders are in `src/database/seeders/`
+- Use Sequelize CLI: `yarn sequelize seed:generate --name seeder-name`
+- Run with: `yarn seed`
+
+## Model Associations
+
+- Define associations in model files or `src/database/models/index.js`
+- Use Sequelize association methods: `hasMany`, `belongsTo`, etc.
+
+## Database Config
+
+- Config is in `src/database/config.json`
+- Use Sequelize CLI with config: `--config src/database/config.json`

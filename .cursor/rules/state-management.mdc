@@ -1,0 +1,79 @@
+---
+description: Zustand state management patterns
+globs: **/store/**/*.ts
+alwaysApply: false
+---
+
+# State Management Patterns
+
+## Zustand Store Structure
+
+### Store Slice Pattern
+
+Create store slices using `StateCreator`:
+
+```typescript
+import { StateCreator } from "zustand"
+import { produce } from "immer"
+
+export interface SliceState {
+  // State properties
+  data: DataType[]
+
+  // Actions
+  setData: (data: DataType[]) => void
+}
+
+export const createSliceStore: StateCreator<SliceState> = (set) => ({
+  data: [],
+  setData: (data) =>
+    set(
+      produce((draft: SliceState) => {
+        draft.data = data
+      })
+    )
+})
+```
+
+## Combining Stores
+
+Combine multiple slices in `src/store/index.ts`:
+
+```typescript
+import { create } from "zustand"
+import { createSliceStore, SliceState } from "@/store/slice/sliceSlice"
+
+export const useStore = create<SliceState>()((...a) => ({
+  ...createSliceStore(...a)
+}))
+```
+
+## Using Stores
+
+Access store in components:
+
+```typescript
+import { useStore } from "@/store"
+
+const data = useStore((state) => state.data)
+const setData = useStore((state) => state.setData)
+```
+
+## Immutability
+
+- Always use `immer`'s `produce` for state updates
+- Never mutate state directly
+- Use `produce` wrapper in `set()` calls
+
+## Store Actions
+
+- Define actions as methods in the store interface
+- Use descriptive names
+- Keep actions focused and single-purpose
+- Document complex actions with JSDoc
+
+## Store State Types
+
+- Export state interfaces for type safety
+- Use TypeScript generics where appropriate
+- Type all store properties and actions

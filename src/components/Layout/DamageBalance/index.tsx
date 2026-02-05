@@ -1,14 +1,16 @@
+"use client"
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
 import { useState } from "react"
 import { motion } from "framer-motion"
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Store
 import { useStore } from "@/store"
 // Components
 import DamageBalanceStatsTable from "./DamageBalanceStatsTable"
-// Services
-import { useFetchAndStoreData } from "@/service/fetcher"
 // Ui
 import Title from "@/ui/Presentation/Title"
 import Text from "@/ui/Presentation/Text"
@@ -17,43 +19,45 @@ import Room, { HiddenRoom } from "@/ui/Layout/Room"
 import Button from "@/ui/Actions/Button"
 // Styles and types
 import { DamageBalanceProps } from "./types"
-import {
-  DamageBalanceInfo,
-  DamageBalancePlayerInfo
-} from "@/constants/types/damage"
 
 /**
  * Renders the DamageBalance component, which displays the total damage dealt and taken
  * for an active game, along with a button to show detailed stats. Allows to open a modal
  * to save a new dice roll for damage dealt or taken.
  *
- * @param {string} [props.className] - Optional additional class names for styling.
- * @param {string | number} props.characterId - The unique identifier for the character for the sheet
- *
- * @returns {JSX.Element} The rendered DamageBalance component.
+ * @param {string} className - Optional additional class names for styling.
+ * @param {number} characterId - The unique identifier for the character for the sheet.
+ * @param {number} campaignId - The ID of the active campaign.
+ * @param {number} gameId - The ID of the currently active game.
  */
-function DamageBalance({ className, characterId }: DamageBalanceProps) {
+function DamageBalance({
+  className,
+  characterId,
+  campaignId,
+  gameId
+}: DamageBalanceProps) {
+  useSetCharacterId(characterId)
   const calculatedClassNames = cx(
     twMerge(
       "damage-balance min-w-full flex justify-center items-center",
       className
     )
   )
+  const utils = trpc.useUtils()
+  const { data: balance, isLoading: balanceLoading } =
+    trpc.stats.damage.game.useQuery(undefined, {
+      enabled: !!characterId && !!gameId
+    })
+  const { data: stats, isLoading: statsLoading } =
+    trpc.stats.damage.table.useQuery(undefined, {
+      enabled: !!characterId
+    })
   const [isShowDetails, setIsShowDetails] = useState(false)
-  const [balance, balanceLoading, fetchBalance] =
-    useFetchAndStoreData<DamageBalanceInfo>(
-      `/api/stats/damage/game`,
-      undefined,
-      characterId
-    )
-  const [stats, statsLoading, fetchStats] = useFetchAndStoreData<
-    DamageBalancePlayerInfo[]
-  >(`/api/stats/damage/table`, undefined, characterId)
-  const fetchData = () => {
-    fetchBalance()
-    fetchStats()
-  }
   const openModal = useStore((state) => state.openModal)
+  const handleDataFetch = () => {
+    utils.stats.damage.game.invalidate()
+    utils.stats.damage.table.invalidate()
+  }
   const handleSaveDiceRoll = (
     e: React.MouseEvent<HTMLDivElement>,
     isPositive: boolean
@@ -62,7 +66,7 @@ function DamageBalance({ className, characterId }: DamageBalanceProps) {
     openModal("damageSaver", {
       isNegative: !isPositive,
       characterId: characterId,
-      onConfirm: fetchData
+      onConfirm: handleDataFetch
     })
   }
   return (
