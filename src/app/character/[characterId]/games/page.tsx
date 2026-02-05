@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { notFound } from "next/navigation"
 // Components
 import GamesList from "@/components/Layout/Games/List"
+import CampaignPlayerStats from "@/components/Layout/Games/CampaignPlayerStats"
 // Ui
 import WallDecorated from "@/ui/Layout/Decorators/WallDecorated"
 import Button from "@/ui/Actions/Button"
@@ -31,10 +32,11 @@ export default function GamesPage({ params }: GamesPageProps) {
       animationMode="slide-both-sides"
       isShortYPadding
     >
-      <Stack>
+      <Stack gap="distant">
         <Button link={`/character/${characterId}`} isText secondary isNoPadding>
           ← Back to Character
         </Button>
+        <CampaignPlayerStats characterId={characterId} />
         <GamesList characterId={characterId} />
       </Stack>
     </WallDecorated>

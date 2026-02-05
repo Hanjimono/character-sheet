@@ -9,6 +9,7 @@ import { useSetCharacterId } from "@/lib/trpc/hooks"
 import DamageBalanceStatsTable from "@/components/Layout/DamageBalance/DamageBalanceStatsTable"
 import DiceBalanceStatsTable from "@/components/Layout/DicaBalance/DiceBalanceStatsTable"
 import MoneyBalanceStatsTable from "@/components/Layout/MoneyBalance/MoneyBalanceStatsTable"
+import PlayerStatBlock from "@/components/Layout/Games/PlayerStatBlock"
 // Ui
 import Beam from "@/ui/Layout/Beam"
 import Title from "@/ui/Presentation/Title"
@@ -64,8 +65,33 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
   })
 
   return (
-    <Stack className={calculatedClassNames}>
+    <Stack className={calculatedClassNames} gap="distant">
       <Title size={2}>Game #{gameId}</Title>
+      <div>
+        <Title size={3} className="mb-3">
+          This game by player
+        </Title>
+        <div className="w-full px-24">
+          <Beam className="gap-same-level">
+            {gameStats.damages.map((d, i) => (
+              <PlayerStatBlock
+                key={d.player.id}
+                playerName={d.player.name}
+                playerImage={d.player.image ?? null}
+                rolls={
+                  gameStats.rolls[i] ?? { totalPositive: 0, totalNegative: 0 }
+                }
+                damages={{
+                  totalPositive: d.totalPositive,
+                  totalNegative: d.totalNegative
+                }}
+                moneyTotal={moneyStats[i]?.amount ?? 0}
+                isGameContext
+              />
+            ))}
+          </Beam>
+        </div>
+      </div>
       <Stack gap="distant">
         <Stack gap="close">
           <Title size={3}>Damages</Title>

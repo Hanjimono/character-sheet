@@ -277,5 +277,35 @@ export const statsRouter = router({
         rolls,
         moneyTransactions
       }
-    })
+    }),
+  getCampaignPlayerStats: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.campaign) {
+      throw new Error("No campaign found")
+    }
+    const { DamageBalance } = await import("@/database/models/damageBalance")
+    const { DiceBalance } = await import("@/database/models/diceBalance")
+    const { MoneyBalance } = await import("@/database/models/moneyBalance")
+
+    const playerStats = []
+    for (const player of ctx.players) {
+      const [damageBalance, diceBalance, moneyBalance] = await Promise.all([
+        DamageBalance.getTotalBalance(ctx.campaign.id, player.id),
+        DiceBalance.getTotalBalance(ctx.campaign.id, player.id),
+        MoneyBalance.getBalance(player.id, ctx.campaign.id, false)
+      ])
+      playerStats.push({
+        player,
+        rolls: {
+          totalPositive: diceBalance.totalPositive,
+          totalNegative: diceBalance.totalNegative
+        },
+        damages: {
+          totalPositive: damageBalance.totalPositive,
+          totalNegative: damageBalance.totalNegative
+        },
+        moneyTotal: moneyBalance
+      })
+    }
+    return playerStats
+  })
 })
