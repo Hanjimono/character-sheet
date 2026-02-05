@@ -1,8 +1,8 @@
-"use server"
+"use client"
 
 import Note from "@/ui/Presentation/Note"
 
-export default async function WithoutCampaignView() {
+export default function WithoutCampaignView() {
   return (
     <Note type="info" title="There is no active campaign">
       Some features as dice roll count or gold management are available only in

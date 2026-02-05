@@ -1,16 +1,7 @@
-// components
-import BreadCrumbs from "@/components/Layout/Breadcrumbs"
-import DrowSpellsPage from "@/components/Sheet/Drow/Spells"
-// ui
-import WallDecorated from "@/ui/Layout/Decorators/WallDecorated"
+// This route is kept only for backwards compatibility.
+// New URLs should use `/{characterId}/spells`.
+import { redirect } from "next/navigation"
 
-const BREADCRUMBS = [{ title: "Персонаж", href: "/" }]
-
-export default function SpellsPage() {
-  return (
-    <WallDecorated animationMode="slide-both-sides" isShortYPadding>
-      <BreadCrumbs title="Способности" items={BREADCRUMBS} />
-      <DrowSpellsPage />
-    </WallDecorated>
-  )
+export default function LegacySpellsPage() {
+  redirect("/")
 }

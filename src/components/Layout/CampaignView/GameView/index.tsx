@@ -23,7 +23,7 @@ import { GameInfo } from "@/constants/types/game"
  * @param {string} props.campaignId - The ID of the campaign associated with the game.
  * @param {string} props.characterId - The ID of the character participating in the game.
  */
-function GameView({ campaignId, characterId }: GameViewProps) {
+export default function GameView({ campaignId, characterId }: GameViewProps) {
   useSetCharacterId(characterId)
   const utils = trpc.useUtils()
   const {
@@ -138,5 +138,3 @@ function GameTimer({ game }: { game: GameInfo }) {
     </span>
   )
 }
-
-export default GameView

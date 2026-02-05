@@ -1,26 +1,49 @@
-"use server"
+"use client"
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
-// Database
-import { Campaign } from "@/database/models/campaign"
-// components
+// Lib
+import { trpc } from "@/lib/trpc/client"
+import { useSetCharacterId } from "@/lib/trpc/hooks"
+// Components
 import WithoutCampaignView from "./WithoutCampaignView"
 import GameView from "./GameView"
-// ui
+// Ui
 import Beam from "@/ui/Layout/Beam"
 import Title from "@/ui/Presentation/Title"
 import Text from "@/ui/Presentation/Text"
 // Styles and types
 import { CampaignViewProps } from "./types"
 
-async function CampaignView({ className, characterId }: CampaignViewProps) {
+/**
+ * CampaignView component displays the active campaign for a character.
+ * Uses tRPC to fetch campaign data.
+ *
+ * @param {string} className - Additional class names to apply
+ * @param {number} characterId - The ID of the character
+ */
+function CampaignView({ className, characterId }: CampaignViewProps) {
+  useSetCharacterId(characterId)
   const calculatedClassNames = cx(twMerge("campaign-view relative"), className)
-  const campaign = await Campaign.getActiveCampaign(characterId)
-  console.log("typeof UserList:", typeof WithoutCampaignView)
+
+  const { data, isLoading } = trpc.campaign.active.useQuery(undefined, {
+    enabled: !!characterId
+  })
+
+  if (isLoading) {
+    return (
+      <Beam className={calculatedClassNames}>
+        <Text size="small">Loading campaign...</Text>
+      </Beam>
+    )
+  }
+
+  const campaign = data?.campaign
+
   if (!campaign) {
     return <WithoutCampaignView />
   }
+
   return (
     <Beam className={calculatedClassNames}>
       <Text className="absolute -top-5 left-1 text-gray-400" size="small">
@@ -33,4 +56,5 @@ async function CampaignView({ className, characterId }: CampaignViewProps) {
     </Beam>
   )
 }
+
 export default CampaignView

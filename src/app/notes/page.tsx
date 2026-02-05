@@ -1,16 +1,7 @@
-// components
-import BreadCrumbs from "@/components/Layout/Breadcrumbs"
-import DrowNotes from "@/components/Sheet/Drow/Notes"
-// ui
-import WallDecorated from "@/ui/Layout/Decorators/WallDecorated"
+// This route is kept only for backwards compatibility.
+// New URLs should use `/{characterId}/notes`.
+import { redirect } from "next/navigation"
 
-const BREADCRUMBS = [{ title: "Персонаж", href: "/" }]
-
-export default function SpellsPage() {
-  return (
-    <WallDecorated animationMode="slide-both-sides" isShortYPadding>
-      <BreadCrumbs title="Записи" items={BREADCRUMBS} />
-      <DrowNotes />
-    </WallDecorated>
-  )
+export default function LegacyNotesPage() {
+  redirect("/")
 }
