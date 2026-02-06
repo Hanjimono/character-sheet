@@ -8,6 +8,8 @@ export interface PlayerStatBlockStats {
     totalNegative: number
   }
   moneyTotal: number
+  selfHarmTotal?: number
+  selfHarmPercentage?: number
 }
 
 export interface PlayerStatBlockProps {
@@ -23,6 +25,10 @@ export interface PlayerStatBlockProps {
   damages: PlayerStatBlockStats["damages"]
   /** Money amount (campaign total or game spent). */
   moneyTotal: number
+  /** Total amount of self-harm damage. */
+  selfHarmTotal?: number
+  /** Percentage of total damage taken that was self-harm. */
+  selfHarmPercentage?: number
   /** If true, labels indicate "this game" context (e.g. "Spent this game"). */
   isGameContext?: boolean
 }

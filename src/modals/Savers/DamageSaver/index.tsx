@@ -33,7 +33,8 @@ import { DamageSaverModalProps } from "./types"
 const damageSaverSchema = z.object({
   comment: z.string().min(1, "Comment is required"),
   count: z.coerce.number().min(0, "Count is required"),
-  isSummon: z.boolean().optional().default(false)
+  isSummon: z.boolean().optional().default(false),
+  isSelfharm: z.boolean().optional().default(false)
 })
 
 /**
@@ -77,13 +78,14 @@ function DamageSaverModal({
     if (!player) {
       return
     }
-    const { count, comment, isSummon } = data
+    const { count, comment, isSummon, isSelfharm } = data
     saveDamageMutation.mutate({
       player: player.id,
       isNegative: isNegative,
       count: count || 0,
       comment: comment,
-      isSummon: isSummon || false
+      isSummon: isSummon || false,
+      isSelfharm: isSelfharm || false
     })
   }
   return (
@@ -115,7 +117,15 @@ function DamageSaverModal({
                   label="Damage count"
                   icon={isNegative ? "shield" : "swords"}
                 />
-                <Checkbox name="isSummon" label="Check if it's not a player" />
+                {isNegative && (
+                  <Checkbox name="isSelfharm" label="Check if it's self-harm" />
+                )}
+                {!isNegative && (
+                  <Checkbox
+                    name="isSummon"
+                    label="Check if it's not a player"
+                  />
+                )}
               </FormElementWrapper>
             </Brick>
           </Inline>

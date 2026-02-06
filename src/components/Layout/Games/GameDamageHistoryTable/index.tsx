@@ -129,6 +129,7 @@ function GameDamageHistoryTable({
                   >
                     {damage.isNegative ? "Taken" : "Dealt"}
                     {damage.isSummon && " (Summon)"}
+                    {damage.isSelfharm && " (Self-harm)"}
                   </span>
                 </td>
                 <td className="px-6 py-4">

@@ -9,6 +9,7 @@ export class DamageBalanceHistory extends Model {
   public gameId!: number
   public isNegative!: boolean
   public isSummon!: boolean
+  public isSelfharm!: boolean
   public comment!: string | null
 
   // timestamps
@@ -22,6 +23,7 @@ export class DamageBalanceHistory extends Model {
     isNegative: boolean,
     count = 0,
     isSummon: boolean = false,
+    isSelfharm: boolean = false,
     comment: string | null = null
   ) {
     await DamageBalanceHistory.create({
@@ -31,6 +33,7 @@ export class DamageBalanceHistory extends Model {
       count: count,
       isNegative: isNegative,
       isSummon: isSummon,
+      isSelfharm: isSelfharm,
       comment: comment
     })
     return true
@@ -61,6 +64,28 @@ export class DamageBalanceHistory extends Model {
       totalPositive,
       totalNegative
     }
+  }
+
+  public static async getSelfHarmSum(
+    campaignId: number,
+    playerId?: number,
+    gameId?: number
+  ) {
+    const where: any = {
+      campaignId: campaignId,
+      isNegative: true,
+      isSelfharm: true,
+      ...(playerId && { playerId: playerId }),
+      ...(gameId && { gameId: gameId })
+    }
+    const damages = await DamageBalanceHistory.findAll({
+      where
+    })
+    let totalSelfHarm = 0
+    for (const damage of damages) {
+      totalSelfHarm += damage.count
+    }
+    return totalSelfHarm
   }
 
   public static async getAllForGame(
@@ -107,6 +132,11 @@ DamageBalanceHistory.init(
       defaultValue: false
     },
     isSummon: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    isSelfharm: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false

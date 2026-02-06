@@ -94,6 +94,8 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
                   totalNegative: d.totalNegative
                 }}
                 moneyTotal={moneyStats[i]?.amount ?? 0}
+                selfHarmTotal={d.selfHarmTotal}
+                selfHarmPercentage={d.selfHarmPercentage}
                 isGameContext
               />
             ))}

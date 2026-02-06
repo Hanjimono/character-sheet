@@ -11,6 +11,7 @@ export interface GameDamageRecord {
   count: number
   isNegative: boolean
   isSummon: boolean
+  isSelfharm: boolean
   comment: string | null
   createdAt: string
 }

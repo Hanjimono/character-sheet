@@ -31,6 +31,8 @@ function PlayerStatBlock({
   rolls,
   damages,
   moneyTotal,
+  selfHarmTotal,
+  selfHarmPercentage,
   isGameContext = false
 }: PlayerStatBlockProps) {
   const calculatedClassNames = cx(
@@ -79,6 +81,16 @@ function PlayerStatBlock({
             <span className="text-gray-400">Taken</span>
             <span className="text-gray-200">{damages.totalNegative}</span>
           </div>
+          {selfHarmTotal !== undefined &&
+            selfHarmPercentage !== undefined &&
+            damages.totalNegative > 0 && (
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-400">Self-harm</span>
+                <span className="text-orange-400">
+                  {selfHarmTotal} ({selfHarmPercentage}%)
+                </span>
+              </div>
+            )}
           <div className="flex justify-between items-center gap-4 pt-1 border-t border-block-600">
             <span className="text-gray-400">
               {isGameContext ? "Spent this game" : "Money total"}

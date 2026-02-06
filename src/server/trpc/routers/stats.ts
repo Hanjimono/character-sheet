@@ -13,6 +13,7 @@ const saveDamageValidateSchema = z.object({
   isNegative: z.boolean().optional(),
   count: z.number(),
   isSummon: z.boolean().optional(),
+  isSelfharm: z.boolean().optional(),
   comment: z.string()
 })
 
@@ -173,6 +174,7 @@ export const statsRouter = router({
             input.isNegative || false,
             input.count,
             input.isSummon || false,
+            input.isSelfharm || false,
             input.comment
           )
         if (!historySaveResult) {
@@ -298,15 +300,28 @@ export const statsRouter = router({
       const moneyTransactions = []
 
       for (const player of ctx.players) {
-        const damageSum = await DamageBalanceHistory.getDamageSum(
-          ctx.campaign.id,
-          input.gameId,
-          player.id
-        )
+        const [damageSum, selfHarmTotal] = await Promise.all([
+          DamageBalanceHistory.getDamageSum(
+            ctx.campaign.id,
+            input.gameId,
+            player.id
+          ),
+          DamageBalanceHistory.getSelfHarmSum(
+            ctx.campaign.id,
+            player.id,
+            input.gameId
+          )
+        ])
+        const selfHarmPercentage =
+          damageSum.totalNegative > 0
+            ? Math.round((selfHarmTotal / damageSum.totalNegative) * 100)
+            : 0
         damages.push({
           player,
           totalPositive: damageSum.totalPositive,
-          totalNegative: damageSum.totalNegative
+          totalNegative: damageSum.totalNegative,
+          selfHarmTotal,
+          selfHarmPercentage
         })
 
         const rollsSum = await DiceBalanceHistory.getRollsSum(
@@ -342,16 +357,25 @@ export const statsRouter = router({
       throw new Error("No campaign found")
     }
     const { DamageBalance } = await import("@/database/models/damageBalance")
+    const { DamageBalanceHistory } = await import(
+      "@/database/models/damageBalanceHistory"
+    )
     const { DiceBalance } = await import("@/database/models/diceBalance")
     const { MoneyBalance } = await import("@/database/models/moneyBalance")
 
     const playerStats = []
     for (const player of ctx.players) {
-      const [damageBalance, diceBalance, moneyBalance] = await Promise.all([
-        DamageBalance.getTotalBalance(ctx.campaign.id, player.id),
-        DiceBalance.getTotalBalance(ctx.campaign.id, player.id),
-        MoneyBalance.getBalance(player.id, ctx.campaign.id, false)
-      ])
+      const [damageBalance, diceBalance, moneyBalance, selfHarmTotal] =
+        await Promise.all([
+          DamageBalance.getTotalBalance(ctx.campaign.id, player.id),
+          DiceBalance.getTotalBalance(ctx.campaign.id, player.id),
+          MoneyBalance.getBalance(player.id, ctx.campaign.id, false),
+          DamageBalanceHistory.getSelfHarmSum(ctx.campaign.id, player.id)
+        ])
+      const selfHarmPercentage =
+        damageBalance.totalNegative > 0
+          ? Math.round((selfHarmTotal / damageBalance.totalNegative) * 100)
+          : 0
       playerStats.push({
         player,
         rolls: {
@@ -362,7 +386,9 @@ export const statsRouter = router({
           totalPositive: damageBalance.totalPositive,
           totalNegative: damageBalance.totalNegative
         },
-        moneyTotal: moneyBalance
+        moneyTotal: moneyBalance,
+        selfHarmTotal,
+        selfHarmPercentage
       })
     }
     return playerStats
@@ -408,6 +434,7 @@ export const statsRouter = router({
             count: record.count,
             isNegative: record.isNegative,
             isSummon: record.isSummon,
+            isSelfharm: record.isSelfharm,
             comment: record.comment,
             createdAt: String(record.createdAt)
           }

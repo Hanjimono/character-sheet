@@ -30,4 +30,6 @@ export interface DamageSaveRequest {
   isNegative?: boolean
   /** Whether the damage is from a summon */
   isSummon?: boolean
+  /** Whether the damage is self-harm (for taken damage) */
+  isSelfharm?: boolean
 }
