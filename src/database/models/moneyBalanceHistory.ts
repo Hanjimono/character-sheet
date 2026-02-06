@@ -150,6 +150,19 @@ export class MoneyBalanceHistory extends Model {
     }
     return info
   }
+
+  public static async getAllForGame(
+    campaignId: number,
+    gameId: number
+  ): Promise<MoneyBalanceHistory[]> {
+    return await MoneyBalanceHistory.findAll({
+      where: {
+        campaignId: campaignId,
+        gameId: gameId
+      },
+      order: [["createdAt", "ASC"]]
+    })
+  }
 }
 
 MoneyBalanceHistory.init(

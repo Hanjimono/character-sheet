@@ -62,6 +62,19 @@ export class DamageBalanceHistory extends Model {
       totalNegative
     }
   }
+
+  public static async getAllForGame(
+    campaignId: number,
+    gameId: number
+  ): Promise<DamageBalanceHistory[]> {
+    return await DamageBalanceHistory.findAll({
+      where: {
+        campaignId: campaignId,
+        gameId: gameId
+      },
+      order: [["createdAt", "ASC"]]
+    })
+  }
 }
 
 DamageBalanceHistory.init(

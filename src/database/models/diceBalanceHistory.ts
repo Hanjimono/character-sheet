@@ -55,6 +55,19 @@ export class DiceBalanceHistory extends Model {
       totalNegative
     }
   }
+
+  public static async getAllForGame(
+    campaignId: number,
+    gameId: number
+  ): Promise<DiceBalanceHistory[]> {
+    return await DiceBalanceHistory.findAll({
+      where: {
+        campaignId: campaignId,
+        gameId: gameId
+      },
+      order: [["createdAt", "ASC"]]
+    })
+  }
 }
 
 DiceBalanceHistory.init(

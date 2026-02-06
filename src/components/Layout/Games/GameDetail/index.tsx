@@ -6,10 +6,10 @@ import { twMerge } from "tailwind-merge"
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
 // Components
-import DamageBalanceStatsTable from "@/components/Layout/DamageBalance/DamageBalanceStatsTable"
-import DiceBalanceStatsTable from "@/components/Layout/DicaBalance/DiceBalanceStatsTable"
-import MoneyBalanceStatsTable from "@/components/Layout/MoneyBalance/MoneyBalanceStatsTable"
 import PlayerStatBlock from "@/components/Layout/Games/PlayerStatBlock"
+import GameDamageHistoryTable from "@/components/Layout/Games/GameDamageHistoryTable"
+import GameRollHistoryTable from "@/components/Layout/Games/GameRollHistoryTable"
+import GameMoneyHistoryTable from "@/components/Layout/Games/GameMoneyHistoryTable"
 // Ui
 import Beam from "@/ui/Layout/Beam"
 import Title from "@/ui/Presentation/Title"
@@ -37,7 +37,15 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
     }
   )
 
-  if (isLoading) {
+  const { data: gameHistory, isLoading: historyLoading } =
+    trpc.stats.getGameHistory.useQuery(
+      { gameId },
+      {
+        enabled: !!characterId && !!gameId
+      }
+    )
+
+  if (isLoading || historyLoading) {
     return (
       <Beam className={calculatedClassNames}>
         <Text size="small">Loading game details...</Text>
@@ -45,7 +53,7 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
     )
   }
 
-  if (!gameStats) {
+  if (!gameStats || !gameHistory) {
     return (
       <Beam className={calculatedClassNames}>
         <Text size="small">No game data found.</Text>
@@ -93,18 +101,9 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
         </div>
       </div>
       <Stack gap="distant">
-        <Stack gap="close">
-          <Title size={3}>Damages</Title>
-          <DamageBalanceStatsTable stats={gameStats.damages} />
-        </Stack>
-        <Stack gap="close">
-          <Title size={3}>Rolls</Title>
-          <DiceBalanceStatsTable stats={gameStats.rolls} />
-        </Stack>
-        <Stack gap="close">
-          <Title size={3}>Money Transactions</Title>
-          <MoneyBalanceStatsTable stats={moneyStats} />
-        </Stack>
+        <GameDamageHistoryTable damages={gameHistory.damages} />
+        <GameRollHistoryTable rolls={gameHistory.rolls} />
+        <GameMoneyHistoryTable transactions={gameHistory.moneyTransactions} />
       </Stack>
     </Stack>
   )

@@ -307,5 +307,118 @@ export const statsRouter = router({
       })
     }
     return playerStats
-  })
+  }),
+  getGameHistory: publicProcedure
+    .input(z.object({ gameId: z.number() }))
+    .query(async ({ input, ctx }) => {
+      if (!ctx.campaign) {
+        throw new Error("No campaign found")
+      }
+      const { DamageBalanceHistory } = await import(
+        "@/database/models/damageBalanceHistory"
+      )
+      const { DiceBalanceHistory } = await import(
+        "@/database/models/diceBalanceHistory"
+      )
+      const { MoneyBalanceHistory } = await import(
+        "@/database/models/moneyBalanceHistory"
+      )
+      const { Player } = await import("@/database/models/player")
+
+      const [damageRecords, rollRecords, moneyRecords] = await Promise.all([
+        DamageBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
+        DiceBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
+        MoneyBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId)
+      ])
+
+      const damages = await Promise.all(
+        damageRecords.map(async (record) => {
+          const player = await Player.findByPk(record.playerId)
+          return {
+            id: record.id,
+            player: player
+              ? {
+                  id: player.id,
+                  name: player.name,
+                  image: player.image,
+                  shortname: player.shortname,
+                  isMe: player.isMain,
+                  isDM: player.isDM
+                }
+              : null,
+            count: record.count,
+            isNegative: record.isNegative,
+            isSummon: record.isSummon,
+            comment: record.comment,
+            createdAt: String(record.createdAt)
+          }
+        })
+      )
+
+      const rolls = await Promise.all(
+        rollRecords.map(async (record) => {
+          const player = await Player.findByPk(record.playerId)
+          return {
+            id: record.id,
+            player: player
+              ? {
+                  id: player.id,
+                  name: player.name,
+                  image: player.image,
+                  shortname: player.shortname,
+                  isMe: player.isMain,
+                  isDM: player.isDM
+                }
+              : null,
+            isNegative: record.isNegative,
+            createdAt: String(record.createdAt)
+          }
+        })
+      )
+
+      const moneyTransactions = await Promise.all(
+        moneyRecords.map(async (record) => {
+          const fromPlayer = record.fromPlayerId
+            ? await Player.findByPk(record.fromPlayerId)
+            : null
+          const toPlayer = record.toPlayerId
+            ? await Player.findByPk(record.toPlayerId)
+            : null
+          return {
+            id: record.id,
+            fromPlayer: fromPlayer
+              ? {
+                  id: fromPlayer.id,
+                  name: fromPlayer.name,
+                  image: fromPlayer.image,
+                  shortname: fromPlayer.shortname,
+                  isMe: fromPlayer.isMain,
+                  isDM: fromPlayer.isDM
+                }
+              : null,
+            toPlayer: toPlayer
+              ? {
+                  id: toPlayer.id,
+                  name: toPlayer.name,
+                  image: toPlayer.image,
+                  shortname: toPlayer.shortname,
+                  isMe: toPlayer.isMain,
+                  isDM: toPlayer.isDM
+                }
+              : null,
+            amount: record.count,
+            isNegative: record.isNegative,
+            isTransfer: record.isTransfer,
+            comment: record.comment,
+            createdAt: String(record.createdAt)
+          }
+        })
+      )
+
+      return {
+        damages,
+        rolls,
+        moneyTransactions
+      }
+    })
 })
