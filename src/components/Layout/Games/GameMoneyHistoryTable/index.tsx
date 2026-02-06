@@ -2,11 +2,14 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// Lib
+import { trpc } from "@/lib/trpc/client"
 // Components
 import MoneyRender from "@/components/Helpers/MoneyRender"
 import SmartImage from "@/ui/Presentation/SmartImage"
 // Ui
 import Title from "@/ui/Presentation/Title"
+import Button from "@/ui/Actions/Button"
 // Styles and types
 import { GameMoneyHistoryTableProps } from "./types"
 
@@ -18,8 +21,28 @@ import { GameMoneyHistoryTableProps } from "./types"
  */
 function GameMoneyHistoryTable({
   className,
-  transactions
+  transactions,
+  onDelete
 }: GameMoneyHistoryTableProps) {
+  const utils = trpc.useUtils()
+  const deleteMutation = trpc.money.delete.useMutation({
+    onSuccess: () => {
+      utils.stats.getGameHistory.invalidate()
+      utils.stats.getGameStats.invalidate()
+      utils.stats.getCampaignPlayerStats.invalidate()
+      utils.money.balance.invalidate()
+      utils.money.stats.invalidate()
+      if (onDelete) {
+        onDelete()
+      }
+    }
+  })
+
+  const handleDelete = async (historyId: number) => {
+    if (confirm("Are you sure you want to delete this money transaction?")) {
+      await deleteMutation.mutateAsync({ historyId })
+    }
+  }
   const calculatedClassNames = cx(
     twMerge(
       "game-money-history-table bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
@@ -64,6 +87,9 @@ function GameMoneyHistoryTable({
               </th>
               <th scope="col" className="px-6 py-3">
                 Comment
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Actions
               </th>
             </tr>
           </thead>
@@ -141,9 +167,10 @@ function GameMoneyHistoryTable({
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span
+                  <div
                     className={cx(
                       twMerge(
+                        "flex items-center gap-1 justify-start",
                         transaction.isNegative
                           ? "text-red-400"
                           : "text-green-400"
@@ -152,10 +179,21 @@ function GameMoneyHistoryTable({
                   >
                     {transaction.isNegative ? "-" : "+"}
                     <MoneyRender amount={transaction.amount} />
-                  </span>
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-gray-300">
                   {transaction.comment || "-"}
+                </td>
+                <td className="px-6 py-4">
+                  <Button
+                    icon="delete"
+                    remove
+                    isText
+                    isSmall
+                    onClick={() => handleDelete(transaction.id)}
+                    disabled={deleteMutation.isPending}
+                    isLoading={deleteMutation.isPending}
+                  />
                 </td>
               </tr>
             ))}

@@ -48,6 +48,33 @@ export const statsRouter = router({
         }
         return true
       }),
+    delete: publicProcedure
+      .input(z.object({ historyId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.campaign) {
+          throw new Error("No campaign found")
+        }
+        const { DiceBalanceHistory } = await import(
+          "@/database/models/diceBalanceHistory"
+        )
+        const { DiceBalance } = await import("@/database/models/diceBalance")
+
+        const historyRecord = await DiceBalanceHistory.findByPk(input.historyId)
+        if (!historyRecord) {
+          throw new Error("Roll history record not found")
+        }
+        if (historyRecord.campaignId !== ctx.campaign.id) {
+          throw new Error("Unauthorized")
+        }
+
+        await DiceBalance.deleteBalanceForPlayer(
+          historyRecord.playerId,
+          ctx.campaign.id,
+          historyRecord.isNegative
+        )
+        await historyRecord.destroy()
+        return true
+      }),
     table: publicProcedure
       .input(
         z.object({
@@ -160,6 +187,38 @@ export const statsRouter = router({
         if (!balanceSaveResult) {
           throw new Error("Failed to save damage balance")
         }
+        return true
+      }),
+    delete: publicProcedure
+      .input(z.object({ historyId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.campaign) {
+          throw new Error("No campaign found")
+        }
+        const { DamageBalanceHistory } = await import(
+          "@/database/models/damageBalanceHistory"
+        )
+        const { DamageBalance } = await import(
+          "@/database/models/damageBalance"
+        )
+
+        const historyRecord = await DamageBalanceHistory.findByPk(
+          input.historyId
+        )
+        if (!historyRecord) {
+          throw new Error("Damage history record not found")
+        }
+        if (historyRecord.campaignId !== ctx.campaign.id) {
+          throw new Error("Unauthorized")
+        }
+
+        await DamageBalance.deleteBalanceForPlayer(
+          historyRecord.playerId,
+          ctx.campaign.id,
+          historyRecord.isNegative,
+          historyRecord.count
+        )
+        await historyRecord.destroy()
         return true
       }),
     table: publicProcedure.query(async ({ ctx }) => {

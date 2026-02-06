@@ -17,4 +17,6 @@ export interface GameRollHistoryTableProps {
   className?: string
   /** Array of roll records to display. */
   rolls: GameRollRecord[]
+  /** Callback to refresh data after deletion. */
+  onDelete?: () => void
 }

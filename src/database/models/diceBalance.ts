@@ -40,6 +40,28 @@ export class DiceBalance extends Model {
     return true
   }
 
+  public static async deleteBalanceForPlayer(
+    playerId: number,
+    campaignId: number,
+    isNegative: boolean
+  ) {
+    const balance = await DiceBalance.findOne({
+      where: {
+        playerId: playerId,
+        campaignId: campaignId
+      }
+    })
+    if (!balance) {
+      return false
+    }
+    if (isNegative) {
+      await balance.decrement("negativeBalance")
+    } else {
+      await balance.decrement("positiveBalance")
+    }
+    return true
+  }
+
   public static async getTotalBalance(campaignId: number, playerId?: number) {
     const balances = await DiceBalance.findAll({
       where: {

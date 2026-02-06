@@ -245,5 +245,113 @@ export const moneyRouter = router({
         }
       }
       return true
+    }),
+  delete: publicProcedure
+    .input(z.object({ historyId: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.campaign) {
+        throw new Error("No campaign found")
+      }
+      const { MoneyBalanceHistory } = await import(
+        "@/database/models/moneyBalanceHistory"
+      )
+      const { MoneyBalance } = await import("@/database/models/moneyBalance")
+      const sequelize = (await import("@/lib/sequlize")).default
+
+      const historyRecord = await MoneyBalanceHistory.findByPk(input.historyId)
+      if (!historyRecord) {
+        throw new Error("Money history record not found")
+      }
+      if (historyRecord.campaignId !== ctx.campaign.id) {
+        throw new Error("Unauthorized")
+      }
+
+      await sequelize.transaction(async (transaction) => {
+        if (historyRecord.isTransfer) {
+          const pairedRecord = await MoneyBalanceHistory.findOne({
+            where: {
+              campaignId: ctx.campaign.id,
+              gameId: historyRecord.gameId,
+              fromPlayerId: historyRecord.fromPlayerId,
+              toPlayerId: historyRecord.toPlayerId,
+              isTransfer: true,
+              isNegative: !historyRecord.isNegative
+            },
+            order: [["createdAt", "ASC"]]
+          })
+
+          if (pairedRecord) {
+            await pairedRecord.destroy({ transaction })
+          }
+
+          if (historyRecord.fromPlayerId) {
+            await MoneyBalance.changeBalance(
+              historyRecord.fromPlayerId,
+              ctx.campaign.id,
+              historyRecord.count,
+              false,
+              false,
+              transaction
+            )
+          }
+          if (historyRecord.toPlayerId) {
+            await MoneyBalance.changeBalance(
+              historyRecord.toPlayerId,
+              ctx.campaign.id,
+              historyRecord.count,
+              false,
+              true,
+              transaction
+            )
+          }
+          if (!historyRecord.fromPlayerId && historyRecord.toPlayerId) {
+            await MoneyBalance.changeBalance(
+              null,
+              ctx.campaign.id,
+              historyRecord.count,
+              true,
+              true,
+              transaction
+            )
+            await MoneyBalance.changeBalance(
+              historyRecord.toPlayerId,
+              ctx.campaign.id,
+              historyRecord.count,
+              false,
+              false,
+              transaction
+            )
+          }
+          if (historyRecord.fromPlayerId && !historyRecord.toPlayerId) {
+            await MoneyBalance.changeBalance(
+              historyRecord.fromPlayerId,
+              ctx.campaign.id,
+              historyRecord.count,
+              false,
+              false,
+              transaction
+            )
+            await MoneyBalance.changeBalance(
+              null,
+              ctx.campaign.id,
+              historyRecord.count,
+              true,
+              false,
+              transaction
+            )
+          }
+        } else {
+          await MoneyBalance.changeBalance(
+            historyRecord.fromPlayerId,
+            ctx.campaign.id,
+            historyRecord.count,
+            historyRecord.fromPlayerId === null,
+            !historyRecord.isNegative,
+            transaction
+          )
+        }
+        await historyRecord.destroy({ transaction })
+      })
+      return true
     })
 })

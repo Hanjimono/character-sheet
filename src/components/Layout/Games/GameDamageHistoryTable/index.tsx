@@ -2,10 +2,13 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// Lib
+import { trpc } from "@/lib/trpc/client"
 // Components
 import SmartImage from "@/ui/Presentation/SmartImage"
 // Ui
 import Title from "@/ui/Presentation/Title"
+import Button from "@/ui/Actions/Button"
 // Styles and types
 import { GameDamageHistoryTableProps } from "./types"
 
@@ -17,8 +20,26 @@ import { GameDamageHistoryTableProps } from "./types"
  */
 function GameDamageHistoryTable({
   className,
-  damages
+  damages,
+  onDelete
 }: GameDamageHistoryTableProps) {
+  const utils = trpc.useUtils()
+  const deleteMutation = trpc.stats.damage.delete.useMutation({
+    onSuccess: () => {
+      utils.stats.getGameHistory.invalidate()
+      utils.stats.getGameStats.invalidate()
+      utils.stats.getCampaignPlayerStats.invalidate()
+      if (onDelete) {
+        onDelete()
+      }
+    }
+  })
+
+  const handleDelete = async (historyId: number) => {
+    if (confirm("Are you sure you want to delete this damage record?")) {
+      await deleteMutation.mutateAsync({ historyId })
+    }
+  }
   const calculatedClassNames = cx(
     twMerge(
       "game-damage-history-table bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
@@ -58,6 +79,9 @@ function GameDamageHistoryTable({
               </th>
               <th scope="col" className="px-6 py-3">
                 Comment
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Actions
               </th>
             </tr>
           </thead>
@@ -122,6 +146,17 @@ function GameDamageHistoryTable({
                 </td>
                 <td className="px-6 py-4 text-gray-300">
                   {damage.comment || "-"}
+                </td>
+                <td className="px-6 py-4">
+                  <Button
+                    icon="delete"
+                    remove
+                    isText
+                    isSmall
+                    onClick={() => handleDelete(damage.id)}
+                    disabled={deleteMutation.isPending}
+                    isLoading={deleteMutation.isPending}
+                  />
                 </td>
               </tr>
             ))}

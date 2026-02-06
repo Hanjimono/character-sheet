@@ -20,4 +20,6 @@ export interface GameDamageHistoryTableProps {
   className?: string
   /** Array of damage records to display. */
   damages: GameDamageRecord[]
+  /** Callback to refresh data after deletion. */
+  onDelete?: () => void
 }

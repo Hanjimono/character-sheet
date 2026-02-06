@@ -28,4 +28,6 @@ export interface GameMoneyHistoryTableProps {
   className?: string
   /** Array of money transaction records to display. */
   transactions: GameMoneyRecord[]
+  /** Callback to refresh data after deletion. */
+  onDelete?: () => void
 }

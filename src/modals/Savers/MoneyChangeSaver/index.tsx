@@ -36,17 +36,12 @@ import { CoinType } from "@/constants/types/money"
 // Styles and types
 import { MoneyChangeSaverModalProps } from "./types"
 
-const optionalNumber = z
-  .union([z.number(), z.string()])
-  .transform((v) => (v === "" || v === undefined ? null : Number(v)))
-  .nullable()
-
 const moneyChangeSchema = z.object({
-  platinum: optionalNumber,
-  electrum: optionalNumber,
-  gold: optionalNumber,
-  silver: optionalNumber,
-  copper: optionalNumber,
+  platinum: z.string().optional(),
+  electrum: z.string().optional(),
+  gold: z.string().optional(),
+  silver: z.string().optional(),
+  copper: z.string().optional(),
   comment: z.string().min(1, "Comment is required")
 })
 
@@ -133,59 +128,57 @@ function MoneyChangeSaverModal({
         }
         useContext
       >
-        <Stack>
-          <Title className="w-full" uppercase size={1} align="center">
-            {title}
-          </Title>
-          <Inline className="justify-center items-center">
+        <Title className="w-full" uppercase size={1} align="center">
+          {title}
+        </Title>
+        <Inline className="justify-center items-center">
+          <PlayerFrameSelect
+            className="w-42 h-42"
+            characterId={characterId}
+            onPlayerSelect={setFromPlayer}
+            selectedPlayerId={fromPlayerId}
+            playersIdsToExclude={toPlayerId ? [toPlayerId] : []}
+          />
+          {isTransfer && <Icon type="md" name="sync_alt" size={32}></Icon>}
+          {isTransfer && (
             <PlayerFrameSelect
               className="w-42 h-42"
               characterId={characterId}
-              onPlayerSelect={setFromPlayer}
-              selectedPlayerId={fromPlayerId}
-              playersIdsToExclude={toPlayerId ? [toPlayerId] : []}
+              onPlayerSelect={setToPlayer}
+              selectedPlayerId={toPlayerId}
+              playersIdsToExclude={fromPlayerId ? [fromPlayerId] : []}
             />
-            {isTransfer && <Icon type="md" name="sync_alt" size={32}></Icon>}
-            {isTransfer && (
-              <PlayerFrameSelect
-                className="w-42 h-42"
-                characterId={characterId}
-                onPlayerSelect={setToPlayer}
-                selectedPlayerId={toPlayerId}
-                playersIdsToExclude={fromPlayerId ? [fromPlayerId] : []}
-              />
-            )}
-            <Brick durability={7} className="w-36 flex flex-col gap-same-level">
-              <CoinInput type="copper" />
-              <CoinInput type="silver" />
-              <CoinInput type="gold" />
+          )}
+          <Brick durability={7} className="w-36 flex flex-col gap-same-level">
+            <CoinInput type="copper" />
+            <CoinInput type="silver" />
+            <CoinInput type="gold" />
+          </Brick>
+        </Inline>
+        <FormElementNestedWrapper>
+          <Inline className="justify-center items-center">
+            <Brick className={cx(twMerge("w-86", "w-142"))} durability={7}>
+              <FormElementWrapper>
+                <Input
+                  className="mb-same-level"
+                  name="comment"
+                  label="Comment"
+                  md={12}
+                />
+              </FormElementWrapper>
+              <Inline className="justify-end">
+                <FormElementWrapper>
+                  <FormSubmit disabled={changeMoneyMutation.isPending}>
+                    Save
+                  </FormSubmit>
+                </FormElementWrapper>
+                <Button onClick={onClose} transparent>
+                  Cancel
+                </Button>
+              </Inline>
             </Brick>
           </Inline>
-          <FormElementNestedWrapper>
-            <Inline className="justify-center items-center">
-              <Brick className={cx(twMerge("w-86", "w-142"))} durability={7}>
-                <FormElementWrapper>
-                  <Input
-                    className="mb-same-level"
-                    name="comment"
-                    label="Comment"
-                    md={12}
-                  />
-                </FormElementWrapper>
-                <Inline className="justify-end">
-                  <FormElementWrapper>
-                    <FormSubmit disabled={changeMoneyMutation.isPending}>
-                      Save
-                    </FormSubmit>
-                  </FormElementWrapper>
-                  <Button onClick={onClose} transparent>
-                    Cancel
-                  </Button>
-                </Inline>
-              </Brick>
-            </Inline>
-          </FormElementNestedWrapper>
-        </Stack>
+        </FormElementNestedWrapper>
       </Form>
     </Modal>
   )

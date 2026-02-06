@@ -2,10 +2,13 @@
 // System
 import { cx } from "class-variance-authority"
 import { twMerge } from "tailwind-merge"
+// Lib
+import { trpc } from "@/lib/trpc/client"
 // Components
 import SmartImage from "@/ui/Presentation/SmartImage"
 // Ui
 import Title from "@/ui/Presentation/Title"
+import Button from "@/ui/Actions/Button"
 // Styles and types
 import { GameRollHistoryTableProps } from "./types"
 
@@ -15,7 +18,28 @@ import { GameRollHistoryTableProps } from "./types"
  * @param {string} className - Additional class names to apply
  * @param {Array} rolls - Array of roll records to display
  */
-function GameRollHistoryTable({ className, rolls }: GameRollHistoryTableProps) {
+function GameRollHistoryTable({
+  className,
+  rolls,
+  onDelete
+}: GameRollHistoryTableProps) {
+  const utils = trpc.useUtils()
+  const deleteMutation = trpc.stats.rolls.delete.useMutation({
+    onSuccess: () => {
+      utils.stats.getGameHistory.invalidate()
+      utils.stats.getGameStats.invalidate()
+      utils.stats.getCampaignPlayerStats.invalidate()
+      if (onDelete) {
+        onDelete()
+      }
+    }
+  })
+
+  const handleDelete = async (historyId: number) => {
+    if (confirm("Are you sure you want to delete this roll record?")) {
+      await deleteMutation.mutateAsync({ historyId })
+    }
+  }
   const calculatedClassNames = cx(
     twMerge(
       "game-roll-history-table bg-block-700 min-w-full min-h-24 h-fit overflow-auto rounded-md p-4",
@@ -49,6 +73,9 @@ function GameRollHistoryTable({ className, rolls }: GameRollHistoryTableProps) {
               </th>
               <th scope="col" className="px-6 py-3">
                 Result
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Actions
               </th>
             </tr>
           </thead>
@@ -96,6 +123,17 @@ function GameRollHistoryTable({ className, rolls }: GameRollHistoryTableProps) {
                   >
                     {roll.isNegative ? "Nat 1" : "Nat 20"}
                   </span>
+                </td>
+                <td className="px-6 py-4">
+                  <Button
+                    icon="delete"
+                    remove
+                    isText
+                    isSmall
+                    onClick={() => handleDelete(roll.id)}
+                    disabled={deleteMutation.isPending}
+                    isLoading={deleteMutation.isPending}
+                  />
                 </td>
               </tr>
             ))}
