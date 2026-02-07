@@ -4,15 +4,18 @@ import MainInfo from "@/components/Layout/MainInfo"
 import MenuLine from "@/components/Layout/MenuLine"
 // Ui
 import Room from "@/ui/Layout/Room"
+import { CharacterSheetProps } from "../Character/types"
 
-export default function CharacterLeftPartView() {
+export default function CharacterLeftPartView({
+  characterId
+}: CharacterSheetProps) {
   return (
     <>
       <Room className="mb-other-level">
-        <MainInfo />
+        <MainInfo characterId={characterId} />
       </Room>
       <Room>
-        <MenuLine />
+        <MenuLine characterId={characterId} />
       </Room>
     </>
   )

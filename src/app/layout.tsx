@@ -9,6 +9,8 @@ import Beam from "@/ui/Layout/Beam"
 import Frame from "@/ui/Layout/Frame"
 // types and styles
 import "./global.css"
+import "./warlock.css"
+import "./wizard.css"
 import Header from "@/components/Layout/Header"
 import Stack from "@/ui/Layout/Stack"
 
@@ -39,10 +41,7 @@ export default function RootLayout({
         <TRPCWrapper>
           <Foundation>
             <Stack className="overflow-hidden h-full" gap="none">
-              <Frame className="main-content">
-                <Header />
-                {children}
-              </Frame>
+              <Frame className="main-content">{children}</Frame>
             </Stack>
           </Foundation>
           <Initializer />

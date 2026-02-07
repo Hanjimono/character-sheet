@@ -62,83 +62,84 @@
       (var(--grid-gap, 1.25rem) / 12)
   );
 
-  --color-page: #000f16;
+  /* Neutral dark color scheme (default). Override by loading warlock.css or wizard.css. */
+  --color-page: #0f1216;
 
-  --color-primary-main: #22646e;
-  --color-primary-hover: #2a7b84;
-  --color-primary-pressed: #1b5f6e;
-  --color-primary-text: #22646e;
-  --color-primary-transparent: rgba(34, 100, 110, 0.1);
-  --color-primary-icon: #22646e;
-  --color-primary-icon-hover: #b8d4e3;
-  --color-primary-transparent-icon: rgba(184, 212, 227, 0.09);
-  --color-primary-transparent-icon-hover: rgba(184, 212, 227, 0.15);
+  --color-primary-main: #4a5568;
+  --color-primary-hover: #5a6578;
+  --color-primary-pressed: #3d4752;
+  --color-primary-text: #4a5568;
+  --color-primary-transparent: rgba(74, 85, 104, 0.1);
+  --color-primary-icon: #4a5568;
+  --color-primary-icon-hover: #a0aec0;
+  --color-primary-transparent-icon: rgba(160, 174, 192, 0.09);
+  --color-primary-transparent-icon-hover: rgba(160, 174, 192, 0.15);
 
-  --color-secondary-main: #5b8fa8;
-  --color-secondary-hover: #6ba0b8;
-  --color-secondary-pressed: #4b7f98;
-  --color-secondary-text: #7ba8c0;
-  --color-secondary-icon: #b8d4e3;
-  --color-secondary-icon-hover: #b8d4e3;
-  --color-secondary-transparent-icon: rgba(184, 212, 227, 0.09);
-  --color-secondary-transparent-icon-hover: rgba(184, 212, 227, 0.15);
+  --color-secondary-main: #718096;
+  --color-secondary-hover: #8192a8;
+  --color-secondary-pressed: #5c6b80;
+  --color-secondary-text: #8b98a8;
+  --color-secondary-icon: #a0aec0;
+  --color-secondary-icon-hover: #a0aec0;
+  --color-secondary-transparent-icon: rgba(160, 174, 192, 0.09);
+  --color-secondary-transparent-icon-hover: rgba(160, 174, 192, 0.15);
 
-  --color-tool-main: #7ba8c0;
-  --color-tool-hover: #5b8fa8;
-  --color-tool-pressed: #4b7f98;
-  --color-tool-text: #000f16;
+  --color-tool-main: #8b98a8;
+  --color-tool-hover: #718096;
+  --color-tool-pressed: #5c6b80;
+  --color-tool-text: #0f1216;
   --color-tool-transparent: transparent;
-  --color-tool-icon: #7ba8c0;
-  --color-tool-icon-hover: #5b8fa8;
+  --color-tool-icon: #8b98a8;
+  --color-tool-icon-hover: #718096;
   --color-tool-transparent-icon: transparent;
   --color-tool-transparent-icon-hover: transparent;
 
-  --color-light-main: #b8d4e3;
-  --color-light-hover: #a8c4d3;
-  --color-light-pressed: #b8d4e3;
-  --color-light-text: #000f16;
-  --color-light-transparent: rgba(184, 212, 227, 0.09);
-  --color-light-icon: #b8d4e3;
-  --color-light-icon-hover: #a8c4d3;
-  --color-light-transparent-icon: rgba(184, 212, 227, 0.09);
-  --color-light-transparent-icon-hover: rgba(184, 212, 227, 0.15);
+  --color-light-main: #a0aec0;
+  --color-light-hover: #90a0b0;
+  --color-light-pressed: #a0aec0;
+  --color-light-text: #0f1216;
+  --color-light-transparent: rgba(160, 174, 192, 0.09);
+  --color-light-icon: #a0aec0;
+  --color-light-icon-hover: #90a0b0;
+  --color-light-transparent-icon: rgba(160, 174, 192, 0.09);
+  --color-light-transparent-icon-hover: rgba(160, 174, 192, 0.15);
 
   --color-remove-main: #ff6b6b;
   --color-remove-hover: #ff5252;
   --color-remove-pressed: #ff3838;
-  --color-remove-text: #000f16;
+  --color-remove-text: #0f1216;
   --color-remove-transparent: rgba(255, 107, 107, 0.1);
-  --color-remove-icon: #b8d4e3;
-  --color-remove-icon-hover: #b8d4e3;
-  --color-remove-transparent-icon: rgba(184, 212, 227, 0.09);
-  --color-remove-transparent-icon-hover: rgba(184, 212, 227, 0.15);
+  --color-remove-icon: #a0aec0;
+  --color-remove-icon-hover: #a0aec0;
+  --color-remove-transparent-icon: rgba(160, 174, 192, 0.09);
+  --color-remove-transparent-icon-hover: rgba(160, 174, 192, 0.15);
 
-  --color-block-100: #004b5c;
-  --color-block-200: #005f6e;
-  --color-block-300: #007284;
-  --color-block-400: #008493;
-  --color-block-500: #003851;
-  --color-block-600: #002535;
-  --color-block-700: #001c2a;
-  --color-block-800: #00141f;
-  --color-block-900: #000d15;
+  --color-block-100: #1a1f26;
+  --color-block-200: #252b33;
+  --color-block-300: #2d3542;
+  --color-block-400: #363d4a;
+  --color-block-500: #151a20;
+  --color-block-600: #0f1318;
+  --color-block-700: #0c0f13;
+  --color-block-800: #080a0d;
+  --color-block-900: #050608;
 
-  --color-menu: #001c2a;
+  --color-menu: #151a20;
 
-  --color-form-main: #002535;
-  --color-form-disabled: #003851;
-  --color-form-border: #5b8fa8;
+  --color-form-main: #151a20;
+  --color-form-disabled: #1a1f26;
+  --color-form-border: #718096;
 
-  --color-gradient-from-link: #002535;
-  --color-gradient-to-link: #5b8fa8;
+  --color-gradient-from-link: #151a20;
+  --color-gradient-to-link: #718096;
 
-  --color-mask: #001c2a;
+  --color-mask: #151a20;
 
-  --color-title: #7ba8c0;
-  --color-text: #b8d4e3;
-  --color-light: #b8d4e3;
-  --color-accent: #5b8fa8;
-  --color-info: #4b7f98;
+  --color-title: #8b98a8;
+  --color-text: #a0aec0;
+  --color-light: #a0aec0;
+  --color-accent: #718096;
+  --color-info: #5c6b80;
   --color-success: #4ecdc4;
   --color-warning: #ffa94d;
 
@@ -262,9 +263,14 @@
 }
 
 html {
-  color: #b8d4e3;
+  color: var(--color-text);
   font-size: 16px;
   line-height: 16px;
+}
+
+.character-sheet {
+  color: var(--color-text);
+  background-color: var(--color-page);
 }
 
 body {
@@ -282,18 +288,18 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #001c2a;
+  background-color: var(--color-mask);
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #5b8fa8;
+  background-color: var(--color-secondary-main);
   border-radius: 20px;
   border: 0px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #7ba8c0;
+  background-color: var(--color-tool-main);
 }
 
 @layer utilities {

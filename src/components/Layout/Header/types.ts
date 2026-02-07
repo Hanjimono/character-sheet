@@ -3,4 +3,6 @@ export interface HeaderProps {
   className?: string
   /** Header title */
   title?: string
+  /** Id of the character for which the header is being displayed */
+  characterId: number
 }
