@@ -3,6 +3,7 @@ import ConfirmModal from "@/modals/Helpers/Confirm"
 import DamageSaverModal from "@/modals/Savers/DamageSaver"
 import DiceRollSaverModal from "@/modals/Savers/DiceRollSaver"
 import MoneyChangeSaverModal from "@/modals/Savers/MoneyChangeSaver"
+import HealSaverModal from "@/modals/Savers/HealSaver"
 
 /** List of all modals */
 export const MODAL_LIST = {
@@ -10,7 +11,8 @@ export const MODAL_LIST = {
   confirm: ConfirmModal,
   diceRollSaver: DiceRollSaverModal,
   moneyChangeSaver: MoneyChangeSaverModal,
-  damageSaver: DamageSaverModal
+  damageSaver: DamageSaverModal,
+  healSaver: HealSaverModal
 }
 
 /** All available modals names */

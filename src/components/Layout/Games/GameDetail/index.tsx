@@ -10,6 +10,7 @@ import PlayerStatBlock from "@/components/Layout/Games/PlayerStatBlock"
 import GameDamageHistoryTable from "@/components/Layout/Games/GameDamageHistoryTable"
 import GameRollHistoryTable from "@/components/Layout/Games/GameRollHistoryTable"
 import GameMoneyHistoryTable from "@/components/Layout/Games/GameMoneyHistoryTable"
+import GameHealHistoryTable from "@/components/Layout/Games/GameHealHistoryTable"
 // Ui
 import Beam from "@/ui/Layout/Beam"
 import Title from "@/ui/Presentation/Title"
@@ -93,6 +94,9 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
                   totalPositive: d.totalPositive,
                   totalNegative: d.totalNegative
                 }}
+                heals={
+                  gameStats.heals[i] ?? { totalPositive: 0, totalNegative: 0 }
+                }
                 moneyTotal={moneyStats[i]?.amount ?? 0}
                 selfHarmTotal={d.selfHarmTotal}
                 selfHarmPercentage={d.selfHarmPercentage}
@@ -105,6 +109,7 @@ function GameDetail({ className, characterId, gameId }: GameDetailProps) {
       <Stack gap="distant">
         <GameDamageHistoryTable damages={gameHistory.damages} />
         <GameRollHistoryTable rolls={gameHistory.rolls} />
+        <GameHealHistoryTable heals={gameHistory.heals} />
         <GameMoneyHistoryTable transactions={gameHistory.moneyTransactions} />
       </Stack>
     </Stack>

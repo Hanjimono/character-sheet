@@ -58,6 +58,7 @@ function CampaignPlayerStats({
               playerImage={stat.player.image ?? null}
               rolls={stat.rolls}
               damages={stat.damages}
+              heals={stat.heals}
               moneyTotal={stat.moneyTotal}
               selfHarmTotal={stat.selfHarmTotal}
               selfHarmPercentage={stat.selfHarmPercentage}

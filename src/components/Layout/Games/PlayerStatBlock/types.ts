@@ -7,6 +7,10 @@ export interface PlayerStatBlockStats {
     totalPositive: number
     totalNegative: number
   }
+  heals: {
+    totalPositive: number
+    totalNegative: number
+  }
   moneyTotal: number
   selfHarmTotal?: number
   selfHarmPercentage?: number
@@ -23,6 +27,8 @@ export interface PlayerStatBlockProps {
   rolls: PlayerStatBlockStats["rolls"]
   /** Damage stats: totalPositive = dealt, totalNegative = taken. */
   damages: PlayerStatBlockStats["damages"]
+  /** Heal stats: totalPositive = given, totalNegative = received. */
+  heals: PlayerStatBlockStats["heals"]
   /** Money amount (campaign total or game spent). */
   moneyTotal: number
   /** Total amount of self-harm damage. */

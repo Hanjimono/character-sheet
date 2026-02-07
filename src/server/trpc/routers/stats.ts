@@ -17,6 +17,13 @@ const saveDamageValidateSchema = z.object({
   comment: z.string()
 })
 
+const saveHealValidateSchema = z.object({
+  player: z.number(),
+  isNegative: z.boolean().optional(),
+  count: z.number(),
+  comment: z.string()
+})
+
 export const statsRouter = router({
   rolls: router({
     save: publicProcedure
@@ -279,6 +286,125 @@ export const statsRouter = router({
       return balanceTotal
     })
   }),
+  heal: router({
+    save: publicProcedure
+      .input(saveHealValidateSchema)
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.game || !ctx.campaign) {
+          throw new Error("No active game or campaign")
+        }
+
+        const { HealBalanceHistory } = await import(
+          "@/database/models/healBalanceHistory"
+        )
+        const { HealBalance } = await import("@/database/models/healBalance")
+
+        const historySaveResult = await HealBalanceHistory.saveHealForPlayer(
+          input.player,
+          ctx.campaign.id,
+          ctx.game.id,
+          input.isNegative || false,
+          input.count,
+          input.comment
+        )
+        if (!historySaveResult) {
+          throw new Error("Failed to save heal history")
+        }
+        const balanceSaveResult = await HealBalance.saveBalanceForPlayer(
+          input.player,
+          ctx.campaign.id,
+          input.isNegative || false,
+          input.count
+        )
+        if (!balanceSaveResult) {
+          throw new Error("Failed to save heal balance")
+        }
+        return true
+      }),
+    delete: publicProcedure
+      .input(z.object({ historyId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.campaign) {
+          throw new Error("No campaign found")
+        }
+        const { HealBalanceHistory } = await import(
+          "@/database/models/healBalanceHistory"
+        )
+        const { HealBalance } = await import("@/database/models/healBalance")
+
+        const historyRecord = await HealBalanceHistory.findByPk(input.historyId)
+        if (!historyRecord) {
+          throw new Error("Heal history record not found")
+        }
+        if (historyRecord.campaignId !== ctx.campaign.id) {
+          throw new Error("Unauthorized")
+        }
+
+        await HealBalance.deleteBalanceForPlayer(
+          historyRecord.playerId,
+          ctx.campaign.id,
+          historyRecord.isNegative,
+          historyRecord.count
+        )
+        await historyRecord.destroy()
+        return true
+      }),
+    table: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.campaign) {
+        throw new Error("No campaign found")
+      }
+      const { HealBalance } = await import("@/database/models/healBalance")
+      const { HealBalanceHistory } = await import(
+        "@/database/models/healBalanceHistory"
+      )
+
+      const stats = []
+      for (const player of ctx.players) {
+        const balance = {
+          totalPositive: 0,
+          totalNegative: 0
+        }
+        if (ctx.game) {
+          const gameBalance = await HealBalanceHistory.getHealSum(
+            ctx.campaign.id,
+            ctx.game.id,
+            player.id
+          )
+          balance.totalPositive = gameBalance.totalPositive
+          balance.totalNegative = gameBalance.totalNegative
+        } else {
+          const balanceTotal = await HealBalance.getTotalBalance(
+            ctx.campaign.id,
+            player.id
+          )
+          balance.totalPositive = balanceTotal.totalPositive
+          balance.totalNegative = balanceTotal.totalNegative
+        }
+        stats.push({
+          player: player,
+          totalPositive: balance.totalPositive,
+          totalNegative: balance.totalNegative
+        })
+      }
+      return stats
+    }),
+    game: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.campaign) {
+        throw new Error("No campaign or game found")
+      }
+      if (!ctx.game) {
+        return { totalPositive: 0, totalNegative: 0 }
+      }
+      const { HealBalanceHistory } = await import(
+        "@/database/models/healBalanceHistory"
+      )
+      const balanceTotal = await HealBalanceHistory.getHealSum(
+        ctx.campaign.id,
+        ctx.game.id
+      )
+      return balanceTotal
+    })
+  }),
   getGameStats: publicProcedure
     .input(z.object({ gameId: z.number() }))
     .query(async ({ input, ctx }) => {
@@ -294,10 +420,14 @@ export const statsRouter = router({
       const { MoneyBalanceHistory } = await import(
         "@/database/models/moneyBalanceHistory"
       )
+      const { HealBalanceHistory } = await import(
+        "@/database/models/healBalanceHistory"
+      )
 
       const damages = []
       const rolls = []
       const moneyTransactions = []
+      const heals = []
 
       for (const player of ctx.players) {
         const [damageSum, selfHarmTotal] = await Promise.all([
@@ -344,12 +474,24 @@ export const statsRouter = router({
           player,
           history: moneyHistory
         })
+
+        const healSum = await HealBalanceHistory.getHealSum(
+          ctx.campaign.id,
+          input.gameId,
+          player.id
+        )
+        heals.push({
+          player,
+          totalPositive: healSum.totalPositive,
+          totalNegative: healSum.totalNegative
+        })
       }
 
       return {
         damages,
         rolls,
-        moneyTransactions
+        moneyTransactions,
+        heals
       }
     }),
   getCampaignPlayerStats: publicProcedure.query(async ({ ctx }) => {
@@ -362,16 +504,23 @@ export const statsRouter = router({
     )
     const { DiceBalance } = await import("@/database/models/diceBalance")
     const { MoneyBalance } = await import("@/database/models/moneyBalance")
+    const { HealBalance } = await import("@/database/models/healBalance")
 
     const playerStats = []
     for (const player of ctx.players) {
-      const [damageBalance, diceBalance, moneyBalance, selfHarmTotal] =
-        await Promise.all([
-          DamageBalance.getTotalBalance(ctx.campaign.id, player.id),
-          DiceBalance.getTotalBalance(ctx.campaign.id, player.id),
-          MoneyBalance.getBalance(player.id, ctx.campaign.id, false),
-          DamageBalanceHistory.getSelfHarmSum(ctx.campaign.id, player.id)
-        ])
+      const [
+        damageBalance,
+        diceBalance,
+        moneyBalance,
+        selfHarmTotal,
+        healBalance
+      ] = await Promise.all([
+        DamageBalance.getTotalBalance(ctx.campaign.id, player.id),
+        DiceBalance.getTotalBalance(ctx.campaign.id, player.id),
+        MoneyBalance.getBalance(player.id, ctx.campaign.id, false),
+        DamageBalanceHistory.getSelfHarmSum(ctx.campaign.id, player.id),
+        HealBalance.getTotalBalance(ctx.campaign.id, player.id)
+      ])
       const selfHarmPercentage =
         damageBalance.totalNegative > 0
           ? Math.round((selfHarmTotal / damageBalance.totalNegative) * 100)
@@ -385,6 +534,10 @@ export const statsRouter = router({
         damages: {
           totalPositive: damageBalance.totalPositive,
           totalNegative: damageBalance.totalNegative
+        },
+        heals: {
+          totalPositive: healBalance.totalPositive,
+          totalNegative: healBalance.totalNegative
         },
         moneyTotal: moneyBalance,
         selfHarmTotal,
@@ -408,13 +561,18 @@ export const statsRouter = router({
       const { MoneyBalanceHistory } = await import(
         "@/database/models/moneyBalanceHistory"
       )
+      const { HealBalanceHistory } = await import(
+        "@/database/models/healBalanceHistory"
+      )
       const { Player } = await import("@/database/models/player")
 
-      const [damageRecords, rollRecords, moneyRecords] = await Promise.all([
-        DamageBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
-        DiceBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
-        MoneyBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId)
-      ])
+      const [damageRecords, rollRecords, moneyRecords, healRecords] =
+        await Promise.all([
+          DamageBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
+          DiceBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
+          MoneyBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId),
+          HealBalanceHistory.getAllForGame(ctx.campaign.id, input.gameId)
+        ])
 
       const damages = await Promise.all(
         damageRecords.map(async (record) => {
@@ -501,10 +659,34 @@ export const statsRouter = router({
         })
       )
 
+      const heals = await Promise.all(
+        healRecords.map(async (record) => {
+          const player = await Player.findByPk(record.playerId)
+          return {
+            id: record.id,
+            player: player
+              ? {
+                  id: player.id,
+                  name: player.name,
+                  image: player.image,
+                  shortname: player.shortname,
+                  isMe: player.isMain,
+                  isDM: player.isDM
+                }
+              : null,
+            count: record.count,
+            isNegative: record.isNegative,
+            comment: record.comment,
+            createdAt: String(record.createdAt)
+          }
+        })
+      )
+
       return {
         damages,
         rolls,
-        moneyTransactions
+        moneyTransactions,
+        heals
       }
     })
 })

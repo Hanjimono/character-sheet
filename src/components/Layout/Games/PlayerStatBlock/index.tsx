@@ -30,6 +30,7 @@ function PlayerStatBlock({
   playerImage,
   rolls,
   damages,
+  heals,
   moneyTotal,
   selfHarmTotal,
   selfHarmPercentage,
@@ -91,6 +92,14 @@ function PlayerStatBlock({
                 </span>
               </div>
             )}
+          <div className="flex justify-between gap-4">
+            <span className="text-gray-400">Heal Given</span>
+            <span className="text-blue-400">{heals.totalPositive}</span>
+          </div>
+          <div className="flex justify-between gap-4">
+            <span className="text-gray-400">Heal Received</span>
+            <span className="text-green-400">{heals.totalNegative}</span>
+          </div>
           <div className="flex justify-between items-center gap-4 pt-1 border-t border-block-600">
             <span className="text-gray-400">
               {isGameContext ? "Spent this game" : "Money total"}

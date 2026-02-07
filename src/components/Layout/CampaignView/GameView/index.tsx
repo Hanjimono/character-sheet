@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import DiceBalance from "@/components/Layout/DicaBalance"
 import MoneyBalance from "@/components/Layout/MoneyBalance"
 import DamageBalance from "@/components/Layout/DamageBalance"
+import HealBalance from "@/components/Layout/HealBalance"
 // Lib
 import { trpc } from "@/lib/trpc/client"
 import { useSetCharacterId } from "@/lib/trpc/hooks"
@@ -87,6 +88,13 @@ export default function GameView({ campaignId, characterId }: GameViewProps) {
       </Room>
       <Room className="w-full">
         <DamageBalance
+          campaignId={campaignId}
+          gameId={!!game ? game.id : undefined}
+          characterId={characterId}
+        />
+      </Room>
+      <Room className="w-full">
+        <HealBalance
           campaignId={campaignId}
           gameId={!!game ? game.id : undefined}
           characterId={characterId}
